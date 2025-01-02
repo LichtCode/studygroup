@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Profile</title>
+    <style>
+        /* Optional CSS for better tag display */
+        #tag-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #tag-list li {
+            display: inline-block;
+            margin: 5px;
+            padding: 5px 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Update Profile</h1>
+    <form method="post" id="tag-form">
+        {% csrf_token %}
+
+        <!-- Username Field -->
+        <div>
+            <label for="id_username">Username:</label>
+            <input type="text" name="username" id="id_username" value="{{ form.username.value }}">
+        </div>
+
+        <!-- Email Field -->
+        <div>
+            <label for="id_email">Email:</label>
+            <input type="email" name="email" id="id_email" value="{{ form.email.value }}">
+        </div>
+
+        <!-- Bio Field -->
+        <div>
+            <label for="id_bio">Bio:</label>
+            <textarea name="bio" id="id_bio">{{ form.bio.value }}</textarea>
+        </div>
+
+        <!-- Tag Input Section -->
+        <div>
+            <label for="tag-input">Add Tags (Press Enter to Add):</label>
+            <input type="text" id="tag-input" placeholder="Type a tag and press Enter">
+            <ul id="tag-list"></ul>
+            <input type="hidden" name="tags" id="tags-hidden">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <script>
+        const tagInput = document.getElementById('tag-input');
+        const tagList = document.getElementById('tag-list');
+        const tagsHidden = document.getElementById('tags-hidden');
+
+        let tags = [];
+
+        // Add tag when Enter is pressed
+        tagInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const tagValue = e.target.value.trim();
+                if (tagValue && !tags.includes(tagValue)) {
+                    tags.push(tagValue);
+
+                    // Add tag to the list in the UI
+                    const li = document.createElement('li');
+                    li.textContent = tagValue;
+                    tagList.appendChild(li);
+
+                    // Clear the input
+                    e.target.value = '';
+
+                    // Update the hidden input
+                    tagsHidden.value = tags.join(',');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
