@@ -1,0 +1,9 @@
+{% for group in groups %}
+    <div class="group">
+        <h3>{{ group.name }}</h3>
+        <p>{{ group.description }}</p>
+        <button class="join-btn" data-group-id="{{ group.group_id }}">Join</button>
+    </div>
+{% empty %}
+    <p>No groups found.</p>
+{% endfor %}

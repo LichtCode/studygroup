@@ -1,11 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser
+from .models import CustomUser, Tag
 
 class UserRegistrationForm(UserCreationForm):
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'password1', 'password2', 'bio']
+        fields = ['username', 'email', 'password1', 'password2']
 
 class UserTagForm(forms.ModelForm):
     tags = forms.CharField(

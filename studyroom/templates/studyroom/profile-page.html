@@ -1,0 +1,126 @@
+{% load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Topic</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Create a New Topic</h1>
+        <form id="create-topic-form">
+            <div>
+                <label for="topic-name">Topic Name:</label>
+                <input type="text" id="topic-name" name="name" required>
+            </div>
+            <div>
+                <label for="topic-description">Description:</label>
+                <textarea id="topic-description" name="description" rows="4"></textarea>
+            </div>
+
+            <!-- Tag Input Section -->
+            <div>
+                <label for="tag-input">Add Tags:</label>
+                <input type="text" list="tag-options" id="tag-input" placeholder="Type a tag or select from suggestions">
+                <datalist id="tag-options">
+                    {% for tag in tags %}
+                        <option value="{{ tag }}"></option>
+                    {% endfor %}
+                </datalist>
+                <button type="button" id="add-tag-button">Add</button>
+                <ul id="tag-list"></ul>
+                <input type="hidden" name="tags" id="tags-hidden">
+            </div>
+            <button type="submit">Post Topic</button>
+        </form>
+
+        <h2>Your Interested Topics</h2>
+        <ul id="interested-topics-list">
+            {% for topic in user.interested_topics.all %}
+                <li>{{ topic.name }} - {{ topic.description }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <script>
+        const tagInput = document.getElementById('tag-input');
+        const tagList = document.getElementById('tag-list');
+        const tagsHidden = document.getElementById('tags-hidden');
+        const addTagButton = document.getElementById('add-tag-button');
+
+        let tags = [];
+
+        function addTag(tagValue) {
+            tagValue = tagValue.trim();
+            if (tagValue && !tags.includes(tagValue)) {
+                tags.push(tagValue);
+
+                // Add tag to the list in the UI
+                const li = document.createElement('li');
+                li.textContent = tagValue;
+                tagList.appendChild(li);
+
+                // Update the hidden input
+                tagsHidden.value = tags.join(',');
+            }
+        }
+
+        // Add tag when Enter is pressed
+        tagInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addTag(e.target.value);
+                e.target.value = ''; // Clear the input
+            }
+        });
+
+        // Add tag when "Add" button is clicked
+        addTagButton.addEventListener('click', function () {
+            addTag(tagInput.value);
+            tagInput.value = ''; // Clear the input
+        });
+    </script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#create-topic-form').on('submit', function (e) {
+                e.preventDefault();  // Prevent form submission
+
+                // Collect form data
+                const formData = {
+                    name: $('#topic-name').val(),
+                    description: $('#topic-description').val(),
+                    tags: $('#topic-tags').val(),
+                    user_id: {{ user.id }}
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                };
+
+                // AJAX request to submit the form data
+                $.ajax({
+                    url: "{% url 'create_topic' %}",
+                    method: "POST",
+                    data: formData,
+                    success: function (response) {
+                        // Update the interested topics list
+                        const newTopic = `<li>${response.name} - ${response.description}</li>`;
+                        $('#interested-topics-list').append(newTopic);
+
+                        // Clear form inputs
+                        $('#topic-name').val('');
+                        $('#topic-description').val('');
+                        $('#topic-tags').val([]);
+                    },
+                    error: function (error) {
+                        console.log(error)
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
