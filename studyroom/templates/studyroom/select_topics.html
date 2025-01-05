@@ -1,0 +1,108 @@
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .blur {
+        filter: blur(5px);
+        pointer-events: none;
+    }
+
+    .interest-modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: seashell;
+        padding: 50px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+    }
+
+    #overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+    }
+</style>
+
+<div id="overlay" class="hidden"></div>
+
+<div id="interest-modal" class="interest-modal hidden">
+    <!-- Interest Section -->
+    <h1>Select Topics of Interest</h1>
+    <form id="interest-form">
+        {% csrf_token %}
+        <ul>
+            {% for tag in tags %}
+                <li>
+                    <input type="checkbox" name="tags" value="{{ tag.id }}"
+                           {% if tag in user_tags %}checked{% endif %}>
+                    {{ tag.name }}
+                </li>
+            {% endfor %}
+        </ul>
+        <button type="submit">Save Topics</button>
+    </form>
+</div>
+
+<script>
+    // Show the modal after 30 seconds
+    setTimeout(() => {
+        document.getElementById('interest-modal').classList.remove('hidden');
+        document.getElementById('overlay').classList.remove('hidden');
+        document.getElementById('main-content').classList.add('blur');
+    }, 30000);
+
+    // Handle form submission via AJAX
+    $(document).ready(function () {
+        $('#interest-form').on('submit', function (e) {
+            e.preventDefault(); // Prevent default form submission behavior
+    
+            // Collect the form data
+            const formData = {
+                tags: $('input[name="tags"]:checked').map(function () {
+                    return this.value;
+                }).get(), // Get values of all checked checkboxes
+                csrfmiddlewaretoken: '{{ csrf_token }}' // Include CSRF token
+            };
+    
+            // Send the AJAX request
+            $.ajax({
+                url: "{% url 'select_topics' %}", // URL for the view
+                method: "POST", // HTTP method
+                data: formData, // Data to send
+                success: function (response) {
+                    console.log(response); // Debug response
+    
+                    if (response.message) {
+                        // Hide the modal and remove blur effect
+                        $('#interest-modal').addClass('hidden');
+                        $('#overlay').addClass('hidden');
+                        $('#main-content').removeClass('blur');
+    
+                        // Optional: Show a success message
+                        console.log(response.message);
+                    } else {
+                        alert('An unexpected error occurred.');
+                    }
+                },
+                error: function (error) {
+                    console.error(error); // Debug error
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+    });
+    
+</script>

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Find Matches</title>
+</head>
+<body>
+    <h1>Users with Similar Interests</h1>
+    <ul>
+        {% for match in matches %}
+            <li>
+                <strong>{{ match.username }}</strong> - Tags: 
+                {{ match.tags.all|join:", " }}
+            </li>
+        {% empty %}
+            <p>No matches found.</p>
+        {% endfor %}
+    </ul>
+</body>
+</html>

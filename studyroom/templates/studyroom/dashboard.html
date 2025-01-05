@@ -1,15 +1,14 @@
-{% load static%}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create New Topic</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
     <div class="container">
+        <!-- Interest Section -->
+        {% include 'studyroom/select_topics.html' %}
+
+        <!-- New Topic Section -->
         <h1>Create a New Topic</h1>
         <form id="create-topic-form">
             <div>
@@ -43,6 +42,21 @@
                 <li>{{ topic.name }} - {{ topic.description }}</li>
             {% endfor %}
         </ul>
+
+        <h1>Users with Similar Interests</h1>
+        <ul>
+            {% for match in matches %}
+                <li>
+                    <strong>{{ match.username }}</strong> - Tags: 
+                    {{ match.tags.all|join:", " }}
+                </li>
+            {% empty %}
+                <p>No matches found.</p>
+            {% endfor %}
+        </ul>
+
+
+
     </div>
 
     <script>
@@ -89,38 +103,42 @@
         $(document).ready(function () {
             $('#create-topic-form').on('submit', function (e) {
                 e.preventDefault();  // Prevent form submission
-
+                console.log('Form is being processed');  // Log the success message
+        
                 // Collect form data
                 const formData = {
                     name: $('#topic-name').val(),
                     description: $('#topic-description').val(),
-                    tags: $('#topic-tags').val(),
-                    user_id: {{ user.id }}
+                    tags: $('#tags-hidden').val(),
+                    user_id: "{{ user.id }}",
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 };
-
+        
                 // AJAX request to submit the form data
                 $.ajax({
                     url: "{% url 'create_topic' %}",
                     method: "POST",
                     data: formData,
                     success: function (response) {
+                        console.log(response); // Log the response for debugging
+        
                         // Update the interested topics list
                         const newTopic = `<li>${response.name} - ${response.description}</li>`;
                         $('#interested-topics-list').append(newTopic);
-
+        
                         // Clear form inputs
                         $('#topic-name').val('');
                         $('#topic-description').val('');
-                        $('#topic-tags').val([]);
+                        $('#tags-hidden').val(''); // Clear hidden input
+                        $('#tag-list').empty();    // Clear tag list in the UI
                     },
                     error: function (error) {
-                        console.log(error)
+                        console.log(error);
                         alert('An error occurred. Please try again.');
                     }
                 });
             });
         });
+        
     </script>
-</body>
-</html>
+{% endblock %}

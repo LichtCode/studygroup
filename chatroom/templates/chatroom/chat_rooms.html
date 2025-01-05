@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Rooms</title>
+</head>
+<body>
+    <h1>Your Chat Rooms</h1>
+    <a href="{% url 'create_chat_room' %}">Create New Room</a>
+    <ul>
+        {% for room in rooms %}
+            <li>
+                <a href="{% url 'chat_room' room.id %}">{{ room.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

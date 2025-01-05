@@ -40,11 +40,17 @@
             <label for="id_bio">Bio:</label>
             <textarea name="bio" id="id_bio">{{ form.bio.value }}</textarea>
         </div>
-
+        
         <!-- Tag Input Section -->
         <div>
-            <label for="tag-input">Add Tags (Press Enter to Add):</label>
-            <input type="text" id="tag-input" placeholder="Type a tag and press Enter">
+            <label for="tag-input">Add Tags:</label>
+            <input type="text" list="tag-options" id="tag-input" placeholder="Type a tag or select from suggestions">
+            <datalist id="tag-options">
+                {% for tag in tags %}
+                    <option value="{{ tag }}"></option>
+                {% endfor %}
+            </datalist>
+            <button type="button" id="add-tag-button">Add</button>
             <ul id="tag-list"></ul>
             <input type="hidden" name="tags" id="tags-hidden">
         </div>

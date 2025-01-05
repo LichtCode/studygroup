@@ -29,7 +29,6 @@ def login(request):
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
 
-
 @login_required
 def update_profile(request):
     user = request.user
@@ -37,7 +36,7 @@ def update_profile(request):
         form = UserTagForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('create_topic')  # Redirect to a profile or another page
+            return redirect('profile')  # Redirect to a profile or another page
     else:
         form = UserTagForm(instance=user)
     return render(request, 'users/update_profile.html', {'form': form})
