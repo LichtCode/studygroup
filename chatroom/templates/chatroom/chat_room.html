@@ -14,12 +14,14 @@
     <button id="send-button">Send</button>
 
     <script>
-        const roomName = "{{ room.id }}";
+        const roomName = {{ room.id }};
+        console.log(typeof(roomName));
         const chatSocket = new WebSocket(
             `ws://${window.location.host}/ws/chat/${roomName}/`
         );
 
         chatSocket.onmessage = function(e) {
+            console.log("Received message from chat room");
             const data = JSON.parse(e.data);
             const messagesDiv = document.getElementById("messages");
             const newMessage = `<p><strong>${data.username}</strong>: ${data.message}</p>`;
@@ -27,10 +29,15 @@
         };
 
         chatSocket.onclose = function(e) {
-            console.error("Chat socket closed unexpectedly");
+            console.error("Chat socket closed unexpectedly. Attempting to reconnect...");
+            {% comment %} setTimeout(() => {
+                window.location.reload(); // Reloads the page to reconnect
+            }, 3000); {% endcomment %}
         };
+        
 
         document.getElementById("send-button").onclick = function() {
+            console.log("Sending message to chat room");
             const inputElement = document.getElementById("message-input");
             const message = inputElement.value;
             chatSocket.send(JSON.stringify({
