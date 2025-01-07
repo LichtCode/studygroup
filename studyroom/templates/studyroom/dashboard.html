@@ -6,7 +6,7 @@
 {% block content %}
     <div class="container">
         <!-- Interest Section -->
-        {% include 'studyroom/select_topics.html' %}
+        {% include 'studyroom/select_topics.html' with tags=tags user_tags=user_tags %}
 
         <!-- New Topic Section -->
         <h1>Create a New Topic</h1>
@@ -38,8 +38,10 @@
 
         <h2>Your Interested Topics</h2>
         <ul id="interested-topics-list">
-            {% for topic in user.interested_topics.all %}
+            {% for topic in user_topics %}
                 <li>{{ topic.name }} - {{ topic.description }}</li>
+            {% empty %}
+                <p>No topics set yet.</p>
             {% endfor %}
         </ul>
 
@@ -54,6 +56,42 @@
                 <p>No matches found.</p>
             {% endfor %}
         </ul>
+
+        <h1>Your Study Sessions</h1>
+        <ul>
+            {% for session in sessions %}
+                <li>{{ session.topic }} on {{ session.date_time }}</li>
+            {% empty %}
+                <p>No sessions found.</p>
+            {% endfor %}
+        </ul>
+
+
+        <div class="container">
+            <h1>My Groups</h1>
+            {% if groups %}
+                <div>
+                    {% for group in groups %}
+                        <div class="group-item">
+                            <h2><a href="{% url 'group_detail' group.group_id %}">{{ group.name }}</a></h2>
+                            <p><strong>Members:</strong> {{ group.members.count }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>You are not a member of any groups yet.</p>
+            {% endif %}
+        </div>
+
+        <h2>Search for a Group</h2>
+        <form id="searchForm">
+            <input type="text" id="searchInput" placeholder="Enter group name or ID" required>
+            <button type="submit">Search</button>
+        </form>
+    
+        <div id="searchResults">
+            <!-- Search results will appear here -->
+        </div>
 
 
 
@@ -110,7 +148,7 @@
                     name: $('#topic-name').val(),
                     description: $('#topic-description').val(),
                     tags: $('#tags-hidden').val(),
-                    user_id: "{{ user.id }}",
+                    user_id: {{ user.id }},
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 };
         
@@ -140,5 +178,51 @@
             });
         });
         
+    </script>
+
+
+    {% comment %} Search group {% endcomment %}
+    <script>
+        $(document).ready(function() {
+            $('#searchForm').submit(function(e) {
+                e.preventDefault();
+                const query = $('#searchInput').val();
+
+                // Send AJAX request to search groups
+                $.ajax({
+                    url: "{% url 'search_group' %}",
+                    method: "GET",
+                    data: {
+                        'q': query
+                    },
+                    success: function(data) {
+                        $('#searchResults').html(data.html);
+                    },
+                    error: function() {
+                        $('#searchResults').html('<p>Error occurred while searching.</p>');
+                    }
+                });
+            });
+
+            $(document).on('click', '.join-btn', function() {
+                const groupId = $(this).data('group-id');
+
+                // Send AJAX request to join group
+                $.ajax({
+                    url: "{% url 'join_group' %}",
+                    method: "POST",
+                    data: {
+                        'group_id': groupId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        alert(data.message);  // Show a success message
+                    },
+                    error: function() {
+                        alert('Error joining the group.');
+                    }
+                });
+            });
+        });
     </script>
 {% endblock %}

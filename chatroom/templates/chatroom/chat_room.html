@@ -4,10 +4,28 @@
     <title>{{ room.name }}</title>
 </head>
 <body>
-    <h1>Chat Room: {{ room.name }}</h1>
+    <h1>
+        Chat Room: 
+        {{ room.name|default:other_member.username }}
+    </h1>
+
+    <h1>Schedule a New Study Session</h1>
+    <form id="schedule-form" method="post">
+        {% csrf_token %}
+        <label for="topic">Topic:</label>
+        <input type="text" name="topic" id="topic" required>
+        <label for="date_time">Date and Time:</label>
+        <input type="datetime-local" name="date_time" id="date_time" required>
+        <button type="submit">Schedule</button>
+    </form>
+
+    <div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+
     <div id="messages">
         {% for message in messages %}
             <p><strong>{{ message.sender.username }}</strong>: {{ message.content }}</p>
+        {% empty %}
+            <p>No messages yet. Start the conversation!</p>
         {% endfor %}
     </div>
     <input type="text" id="message-input" placeholder="Type a message">
@@ -29,9 +47,9 @@
         };
 
         chatSocket.onclose = function(e) {
-            console.error("Chat socket closed unexpectedly. Attempting to reconnect...");
+            console.error("Chat socket closed unexpectedly.");
             {% comment %} setTimeout(() => {
-                window.location.reload(); // Reloads the page to reconnect
+                window.location.reload();
             }, 3000); {% endcomment %}
         };
         
@@ -45,6 +63,34 @@
             }));
             inputElement.value = "";
         };
+    </script>
+
+    <script>
+        $(document).ready(function() {
+            $('#schedule-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    topic: $('#topic').val(),
+                    date_time: $('#date_time').val(),
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
+                    room_id: room.id
+                };
+
+                $.ajax({
+                    url: "{% url 'schedule_session' %}",
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        $('#response-message').text("Study session scheduled successfully!");
+                        $('#schedule-form')[0].reset();
+                    },
+                    error: function(xhr) {
+                        $('#response-message').text("Failed to schedule study session. Please try again.").css("color", "red");
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>

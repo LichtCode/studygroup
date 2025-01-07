@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Your Study Sessions</title>
+</head>
+<body>
+    <h1>Your Study Sessions</h1>
+    <ul>
+        {% for session in sessions %}
+            <li>{{ session.topic }} on {{ session.date_time }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

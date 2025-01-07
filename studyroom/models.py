@@ -1,5 +1,6 @@
 from django.db import models
 from users.models import CustomUser
+from chatroom.models import ChatRoom
 from django.db import models
 from users.models import Tag
 import random
@@ -19,9 +20,33 @@ class Group(models.Model):
     owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='owned_groups')
     members = models.ManyToManyField(CustomUser, related_name='study_groups', blank=True)
     tags = models.ManyToManyField(Tag, related_name='group_tags', blank=True)
+    chat_room = models.OneToOneField(ChatRoom, on_delete=models.CASCADE, related_name='group', null=True, blank=True)
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        """
+        Overrides the save method to ensure a ChatRoom is created and linked when a Group is created.
+        """
+        is_new = self.pk is None  # Check if this is a new group
+        super().save(*args, **kwargs)
+        if is_new:  # Only create a ChatRoom for new groups
+            chat_room = ChatRoom.objects.create(name=f"Group Chat: {self.name}")
+            chat_room.members.add(self.owner)  # Add the owner to the chatroom
+            chat_room.save()
+            self.chat_room = chat_room
+            super().save(*args, **kwargs)  # Save again to link the chat_room
+
+    def add_member_to_group(self, user):
+        """
+        Adds a member to the group and to the associated chatroom.
+        """
+        self.members.add(user)  # Add user to the group
+        if self.chat_room:  # Add user to the associated chatroom if it exists
+            self.chat_room.members.add(user)
+            self.chat_room.save()
+
 
 
 class Topic(models.Model):

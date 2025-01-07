@@ -1,5 +1,6 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from .forms import UserRegistrationForm
+from .models import CustomUser
 from django.contrib.auth.decorators import login_required
 from .forms import UserTagForm
 from django.contrib.auth import authenticate, login as auth_login
@@ -28,6 +29,10 @@ def login(request):
     else:
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
+
+def profile_detail(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+    return render(request, 'users/profile_detail.html', {'user': user})
 
 @login_required
 def update_profile(request):

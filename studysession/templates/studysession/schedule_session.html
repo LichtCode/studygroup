@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule a New Study Session</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Schedule a New Study Session</h1>
+    <form id="schedule-form" method="post">
+        {% csrf_token %}
+        <label for="topic">Topic:</label>
+        <input type="text" name="topic" id="topic" required>
+        <label for="date_time">Date and Time:</label>
+        <input type="datetime-local" name="date_time" id="date_time" required>
+        <button type="submit">Schedule</button>
+    </form>
+
+    <div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+
+    <script>
+        $(document).ready(function() {
+            $('#schedule-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    topic: $('#topic').val(),
+                    date_time: $('#date_time').val(),
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val() // CSRF token
+                };
+
+                $.ajax({
+                    url: "{% url 'schedule_session' %}", // Update with the correct view URL
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        $('#response-message').text("Study session scheduled successfully!");
+                        $('#schedule-form')[0].reset();
+                    },
+                    error: function(xhr) {
+                        $('#response-message').text("Failed to schedule study session. Please try again.").css("color", "red");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

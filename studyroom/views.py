@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from .models import Group, Topic
@@ -6,24 +6,28 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from users.models import Tag, CustomUser
-
-@login_required
-def search_group(request):
-    query = request.GET.get('q', '')
-    groups = Group.objects.filter(Q(name__icontains=query) | Q(group_id__icontains=query))
-
-    if request.is_ajax():
-        html = render_to_string('studyroom/search_results.html', {'groups': groups})
-        return JsonResponse({'html': html})
-    
-    return render(request, 'studyroom/search_group.html')
+from studysession.models import StudySession
 
 @login_required
 def user_dashboard(request):
 
-    tags = Tag.objects.all()  # Fetch all tags for the dropdown
-    user_topics = request.user.interested_topics.all()  # Fetch topics the user is interested in
-    return render(request, 'studyroom/dashboard.html', {'tags': tags, 'user': request.user})
+    tags = Tag.objects.all()
+    sessions = request.user.sessions.all()
+    user_topics = request.user.interested_topics.all()
+
+    user = request.user
+    user_tags = user.tags.all()
+    matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
+    groups = Group.objects.filter(members=user)
+    context = {
+        "sessions": sessions,
+        "tags": tags,
+        "user_topics": user_topics,
+        "user": user,
+        "matches": matches,
+        'groups': groups
+    }
+    return render(request, 'studyroom/dashboard.html', context)
 
 @csrf_exempt
 def create_topic(request):
@@ -31,7 +35,6 @@ def create_topic(request):
         name = request.POST.get('name')
         description = request.POST.get('description')
         tags = request.POST.get('tags', '')
-        user_id = request.POST.get('user')
 
         if not name or not description:
             return JsonResponse({'error': 'Name and Description are required.'}, status=400)
@@ -46,8 +49,7 @@ def create_topic(request):
             tag, _ = Tag.objects.get_or_create(name=tag_name)
             topic.tags.add(tag)
 
-        if user_id:
-            topic.interested_users.add(user_id)
+        topic.interested_users.add(request.user)
 
         return JsonResponse({
             'name': topic.name,
@@ -80,8 +82,24 @@ def find_matches(request):
 
     return render(request, "studyroom/matches.html", {"matches": matches})
 
+@login_required
+def group_detail(request, group_id):
+    """
+    Renders the group details page.
+    """
+    group = get_object_or_404(Group, group_id=group_id)
+    return render(request, 'group_detail.html', {'group': group})
 
+@login_required
+def search_group(request):
+    query = request.GET.get('q', '')
+    groups = Group.objects.filter(Q(name__icontains=query) | Q(group_id__icontains=query))
 
+    if request.is_ajax():
+        html = render_to_string('studyroom/search_results.html', {'groups': groups})
+        return JsonResponse({'html': html})
+    
+    return render(request, 'studyroom/search_group.html')
 
 @login_required
 def join_group(request):
@@ -89,7 +107,7 @@ def join_group(request):
         group_id = request.POST.get('group_id')
         try:
             group = Group.objects.get(group_id=group_id)
-            group.members.add(request.user)  # Add the current user to the group
+            group.add_member_to_group(request.user)  # Add the current user to the group
             return JsonResponse({'message': 'You have successfully joined the group!'})
         except Group.DoesNotExist:
             return JsonResponse({'message': 'Group not found.'}, status=404)
