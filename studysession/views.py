@@ -6,6 +6,7 @@ from chatroom.models import ChatRoom
 
 @login_required
 def schedule_session(request):
+    print(request.user)
     if request.method == "POST":
         topic = request.POST["topic"]
         date_time = request.POST["date_time"]

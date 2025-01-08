@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Groups{% endblock %}
+
+{% block content %}
+
+<h5 class="card-title">My Groups</h5>
+<ul id="groupList" class="list-unstyled">
+    {% if user_groups %}
+        {% for group in user_groups %}
+            <li>
+                <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
+                - Members: {{ group.members.count }}
+            </li>
+        {% endfor %}
+    {% else %}
+        <p>You are not a member of any groups yet.</p>
+    {% endif %}
+</ul>
+
+<h1>Create a New Group</h1>
+<form id="create-group-form" method="post">
+    {% csrf_token %}
+    <label for="group-name">Group Name:</label>
+    <input type="text" id="group-name" name="name" required>
+
+    <label for="group-description">Description:</label>
+    <textarea id="group-description" name="description" placeholder="Optional"></textarea>
+
+    {% include 'studyroom/tags.html' with tags=tags %}
+
+    <button type="submit">Create Group</button>
+</form>
+
+<div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+
+<h2>Search for a Group</h2>
+<form id="searchForm">
+    <input type="text" id="searchInput" placeholder="Enter group name or ID" required>
+    <button type="submit">Search</button>
+</form>
+
+<div id="searchResults">
+    <!-- Search results will appear here -->
+</div>
+
+
+    {% comment %} Search group {% endcomment %}
+    <script>
+        $(document).ready(function() {
+            $('#searchForm').submit(function(e) {
+                e.preventDefault();
+                const query = $('#searchInput').val();
+
+                // Send AJAX request to search groups
+                $.ajax({
+                    url: "{% url 'search_group' %}",
+                    method: "GET",
+                    data: {
+                        'q': query
+                    },
+                    success: function(data) {
+                        $('#searchResults').html(data.html);
+                    },
+                    error: function() {
+                        $('#searchResults').html('<p>Error occurred while searching.</p>');
+                    }
+                });
+            });
+
+            $(document).on('click', '.join-btn', function() {
+                const groupId = $(this).data('group-id');
+
+                // Send AJAX request to join group
+                $.ajax({
+                    url: "{% url 'join_group' %}",
+                    method: "POST",
+                    data: {
+                        'group_id': groupId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        const newGroup = `
+                            <li>
+                                <a href="/group/${data.group_id}/">${data.name}</a>
+                                - Members: ${data.members}
+                            </li>`;
+                        $('#groupList').append(newGroup);
+                        alert(data.message);  // Show a success message
+                    },
+                    error: function() {
+                        alert('Error joining the group.');
+                    }
+                });
+            });
+        });
+    </script>
+
+        <script>
+            $(document).ready(function () {
+                $('#create-group-form').on('submit', function (e) {
+                    e.preventDefault(); // Prevent the default form submission
+        
+                    // Collect form data
+                    const formData = {
+                        name: $('#group-name').val(),
+                        description: $('#group-description').val(),
+                        tags: $('#tags-hidden').val(),
+                        csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val() // CSRF token
+                    };
+        
+                    // AJAX request to submit the form data
+                    $.ajax({
+                        url: "{% url 'create_group' %}",
+                        method: "POST",
+                        data: formData,
+                        success: function (response) {
+                            console.log(response); // Log the response for debugging
+        
+                            // Update the interested topics list
+                            const newGroup = `
+                                <li>
+                                    <a href="/group/${response.group_id}/">${response.name}</a>
+                                    - Members: 1
+                                </li>`;
+                            $('#groupList').append(newGroup);
+        
+                            // Clear form inputs
+                            $('#group-name').val('');
+                            $('#group-description').val('');
+                            $('#tags-hidden').val(''); // Clear hidden input
+                        },
+                        error: function (error) {
+                            console.log(error.responseJSON);
+                            alert(error.responseJSON.error || 'An error occurred. Please try again.');
+                        }
+                    });
+                });
+            });
+        </script>
+        
+{% endblock %}

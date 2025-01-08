@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}All Topics{% endblock %}
+
+{% block content %}
+
+<h5 class="card-title">Your Interested Topics</h5>
+<ul id="interested-topics-list" class="list-unstyled">
+    {% for topic in user_topics %}
+        <li><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+    {% empty %}
+        <p>No topics set yet.</p>
+    {% endfor %}
+</ul>
+
+
+<h1>Create a New Topic</h1>
+<form id="create-topic-form">
+    <div>
+        <label for="topic-name">Topic Name:</label>
+        <input type="text" id="topic-name" name="name" required>
+    </div>
+    <div>
+        <label for="topic-description">Description:</label>
+        <textarea id="topic-description" name="description" rows="4"></textarea>
+    </div>
+
+    <!-- Tag Input Section -->
+    {% include 'studyroom/tags.html' with tags=tags %}
+
+    <button type="submit">Post Topic</button>
+</form>
+
+
+
+<script>
+    $(document).ready(function () {
+        $('#create-topic-form').on('submit', function (e) {
+            e.preventDefault();  // Prevent form submission
+            console.log('Form is being processed');  // Log the success message
+    
+            // Collect form data
+            const formData = {
+                name: $('#topic-name').val(),
+                description: $('#topic-description').val(),
+                tags: $('#tags-hidden').val(),
+                user_id: {{ user.id }},
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+    
+            // AJAX request to submit the form data
+            $.ajax({
+                url: "{% url 'create_topic' %}",
+                method: "POST",
+                data: formData,
+                success: function (response) {
+                    console.log(response);
+    
+                    // Update the interested topics list
+                    const newTopic = `<li>${response.name} - ${response.description}</li>`;
+                    $('#interested-topics-list').append(newTopic);
+    
+                    // Clear form inputs
+                    $('#topic-name').val('');
+                    $('#topic-description').val('');
+                    $('#tags-hidden').val(''); // Clear hidden input
+                    $('#tag-list').empty();    // Clear tag list in the UI
+                },
+                error: function (error) {
+                    console.log(error);
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+    });
+    
+</script>
+
+{% endblock %}

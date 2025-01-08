@@ -2,34 +2,157 @@
 <html>
 <head>
     <title>{{ room.name }}</title>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .chat-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        .chat-header {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e9ecef;
+            padding-bottom: 10px;
+        }
+        .chat-header img {
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .chat-bubble {
+            border-radius: 15px;
+            padding: 10px 15px;
+            max-width: 80%;
+            margin-bottom: 10px;
+        }
+        .chat-bubble-left {
+            background-color: #f1f3f5;
+            align-self: flex-start;
+        }
+        .chat-bubble-right {
+            background-color: #007bff;
+            color: #ffffff;
+            align-self: flex-end;
+        }
+        .chat-footer {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #e9ecef;
+            padding-top: 10px;
+        }
+        .chat-footer input {
+            flex: 1;
+            border-radius: 20px;
+            border: 1px solid #ced4da;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        .chat-footer button {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+        }
+        .chat-timestamp {
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+    </style>
 </head>
 <body>
-    <h1>
-        Chat Room: 
-        {{ room.name|default:other_member.username }}
-    </h1>
-
-    <h1>Schedule a New Study Session</h1>
-    <form id="schedule-form" method="post">
-        {% csrf_token %}
-        <label for="topic">Topic:</label>
-        <input type="text" name="topic" id="topic" required>
-        <label for="date_time">Date and Time:</label>
-        <input type="datetime-local" name="date_time" id="date_time" required>
-        <button type="submit">Schedule</button>
-    </form>
-
-    <div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
-
-    <div id="messages">
-        {% for message in messages %}
-            <p><strong>{{ message.sender.username }}</strong>: {{ message.content }}</p>
-        {% empty %}
-            <p>No messages yet. Start the conversation!</p>
-        {% endfor %}
+    <div class="chat-container">
+        <!-- Chat Header -->
+        <div class="chat-header d-flex align-items-center">
+            <img src="https://via.placeholder.com/50" alt="Profile Picture">
+            <div>
+                <h6 class="mb-0">{{ room.name }}</h6>
+                <small class="text-success">Online</small>
+            </div>
+        </div>
+    
+        <!-- Chat Body -->
+        <div id="messages" class="chat-body d-flex flex-column mt-3">
+            {% for message in messages %}
+                {% if message.sender == request.user %}
+                    <div class="chat-bubble chat-bubble-right">
+                        {{ message.content }}
+                        <div class="chat-timestamp text-end">{{ message.timestamp|date:"H:i" }}</div>
+                    </div>
+                {% else %}
+                    <div class="chat-bubble chat-bubble-left">
+                        {{ message.content }}
+                        <div class="chat-timestamp text-end">{{ message.timestamp|date:"H:i" }}</div>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <p>No messages yet. Start the conversation!</p>
+            {% endfor %}
+        </div>
+    
+        <!-- Chat Footer -->
+        <div class="chat-footer mt-3">
+            <input type="text" id="message-input" placeholder="Type your message here...">
+            <button id="send-button">
+                <i class="bi bi-send"></i>
+            </button>
+        </div>
+    
+        <!-- Study Session Form -->
+        <div class="mt-4">
+            <h1>Schedule a New Study Session</h1>
+            <form id="schedule-form" method="post">
+                {% csrf_token %}
+                <label for="topic">Topic:</label>
+                <input type="text" name="topic" id="topic" required>
+                <label for="date_time">Date and Time:</label>
+                <input type="datetime-local" name="date_time" id="date_time" required>
+                <button type="submit">Schedule</button>
+            </form>
+            <div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+        </div>
     </div>
-    <input type="text" id="message-input" placeholder="Type a message">
-    <button id="send-button">Send</button>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {% comment %} schedule form script {% endcomment %}
+    <script>
+        $(document).ready(function() {
+            console.log("about to send a schedule")
+            $('#schedule-form').on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    topic: $('#topic').val(),
+                    date_time: $('#date_time').val(),
+                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
+                    room_id: {{room.id}}
+                };
+                console.log("about to send a schedule")
+                $.ajax({
+                    url: "{% url 'schedule_session' %}",
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        $('#response-message').text("Study session scheduled successfully!");
+                        $('#schedule-form')[0].reset();
+                    },
+                    error: function(xhr) {
+                        $('#response-message').text("Failed to schedule study session. Please try again.").css("color", "red");
+                    }
+                });
+            });
+        });
+    </script>
 
     <script>
         const roomName = {{ room.id }};
@@ -63,34 +186,6 @@
             }));
             inputElement.value = "";
         };
-    </script>
-
-    <script>
-        $(document).ready(function() {
-            $('#schedule-form').on('submit', function(e) {
-                e.preventDefault();
-                
-                const formData = {
-                    topic: $('#topic').val(),
-                    date_time: $('#date_time').val(),
-                    csrfmiddlewaretoken: $('[name=csrfmiddlewaretoken]').val(),
-                    room_id: room.id
-                };
-
-                $.ajax({
-                    url: "{% url 'schedule_session' %}",
-                    type: "POST",
-                    data: formData,
-                    success: function(response) {
-                        $('#response-message').text("Study session scheduled successfully!");
-                        $('#schedule-form')[0].reset();
-                    },
-                    error: function(xhr) {
-                        $('#response-message').text("Failed to schedule study session. Please try again.").css("color", "red");
-                    }
-                });
-            });
-        });
     </script>
 </body>
 </html>

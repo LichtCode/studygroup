@@ -3,8 +3,14 @@ from .forms import UserRegistrationForm
 from .models import CustomUser
 from django.contrib.auth.decorators import login_required
 from .forms import UserTagForm
-from django.contrib.auth import authenticate, login as auth_login
+from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
+
+def logout_view(request):
+
+    logout(request)  # Logs out the user
+    
+    return redirect('login')
 
 def register(request):
     if request.method == 'POST':
@@ -25,14 +31,14 @@ def login(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 auth_login(request, user)
-                return redirect('create_topic')  # Redirect to the home page after successful login
+                return redirect('dashboard')
     else:
         form = AuthenticationForm()
     return render(request, 'users/login.html', {'form': form})
 
 def profile_detail(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    return render(request, 'users/profile_detail.html', {'user': user})
+    return render(request, 'users/profile_details.html', {'user': user})
 
 @login_required
 def update_profile(request):

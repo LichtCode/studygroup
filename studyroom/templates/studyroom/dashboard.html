@@ -3,226 +3,173 @@
 
 {% block title %}Dashboard{% endblock %}
 
-{% block content %}
-    <div class="container">
+
+
+
+ {% block content %}
+
+ <style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+    }
+
+    .profile-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+
+    .tags-card {
+        background-color: #00bfa6;
+        color: #fff;
+        padding: 15px;
+        border-radius: 5px;
+        height: 100%;
+    }
+
+    .card-title {
+        font-weight: bold;
+    }
+
+    .contact-icon {
+        margin-right: 10px;
+    }
+
+    .notifications {
+        font-size: 24px;
+    }
+</style>
+
+    {% comment %} <div class="container">
         <!-- Interest Section -->
-        {% include 'studyroom/select_topics.html' with tags=tags user_tags=user_tags %}
+        {% include 'studyroom/select_topics.html' with tags=tags user_tags=user_tags %} {% endcomment %}
 
         <!-- New Topic Section -->
-        <h1>Create a New Topic</h1>
-        <form id="create-topic-form">
-            <div>
-                <label for="topic-name">Topic Name:</label>
-                <input type="text" id="topic-name" name="name" required>
+        
+
+        <div class="container mt-4">
+            <!-- Profile Header -->
+            <div class="profile-header">
+                <img src="https://via.placeholder.com/50" alt="Profile" class="profile-img">
+                <h2>Jonathan Patterson</h2>
             </div>
-            <div>
-                <label for="topic-description">Description:</label>
-                <textarea id="topic-description" name="description" rows="4"></textarea>
-            </div>
-
-            <!-- Tag Input Section -->
-            <div>
-                <label for="tag-input">Add Tags:</label>
-                <input type="text" list="tag-options" id="tag-input" placeholder="Type a tag or select from suggestions">
-                <datalist id="tag-options">
-                    {% for tag in tags %}
-                        <option value="{{ tag }}"></option>
-                    {% endfor %}
-                </datalist>
-                <button type="button" id="add-tag-button">Add</button>
-                <ul id="tag-list"></ul>
-                <input type="hidden" name="tags" id="tags-hidden">
-            </div>
-            <button type="submit">Post Topic</button>
-        </form>
-
-        <h2>Your Interested Topics</h2>
-        <ul id="interested-topics-list">
-            {% for topic in user_topics %}
-                <li>{{ topic.name }} - {{ topic.description }}</li>
-            {% empty %}
-                <p>No topics set yet.</p>
-            {% endfor %}
-        </ul>
-
-        <h1>Users with Similar Interests</h1>
-        <ul>
-            {% for match in matches %}
-                <li>
-                    <strong>{{ match.username }}</strong> - Tags: 
-                    {{ match.tags.all|join:", " }}
-                </li>
-            {% empty %}
-                <p>No matches found.</p>
-            {% endfor %}
-        </ul>
-
-        <h1>Your Study Sessions</h1>
-        <ul>
-            {% for session in sessions %}
-                <li>{{ session.topic }} on {{ session.date_time }}</li>
-            {% empty %}
-                <p>No sessions found.</p>
-            {% endfor %}
-        </ul>
-
-
-        <div class="container">
-            <h1>My Groups</h1>
-            {% if groups %}
-                <div>
-                    {% for group in groups %}
-                        <div class="group-item">
-                            <h2><a href="{% url 'group_detail' group.group_id %}">{{ group.name }}</a></h2>
-                            <p><strong>Members:</strong> {{ group.members.count }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p>You are not a member of any groups yet.</p>
-            {% endif %}
-        </div>
-
-        <h2>Search for a Group</h2>
-        <form id="searchForm">
-            <input type="text" id="searchInput" placeholder="Enter group name or ID" required>
-            <button type="submit">Search</button>
-        </form>
     
-        <div id="searchResults">
-            <!-- Search results will appear here -->
+            <h3>Dashboard</h3>
+    
+            <div class="row gy-4">
+                <!-- Tags Section -->
+                <div class="col-md-4">
+                    <div class="tags-card">
+                        <h4>Tags</h4>
+                        {% if user_tags %}
+                            {% for tag in user_tags %}
+                                <p>{{ tag }}</p> 
+                            {% endfor %}
+                        {% else %}
+                            <p>You are yet to add any.</p>
+                        {% endif %}
+                    </div>
+                </div>
+    
+                <!-- Interested Topics -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Your Interested Topics</h5>
+                            <ul id="interested-topics-list" class="list-unstyled">
+                                {% for topic in user_topics %}
+                                    <li><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+                                {% empty %}
+                                    <p>No topics set yet.</p>
+                                {% endfor %}
+                            </ul>
+                            <button><a href="{% url 'topics' %}">More</a></button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Users with Similar Interests -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Users with Similar Interests</h5>
+                            <ul class="list-unstyled">
+                                {% for match in matches %}
+                                    <li>
+                                        <a href="{% url 'profile' match.id %}">
+                                            <span class="contact-icon">📞</span>
+                                            <strong>{{ match.username }}</strong> - Tags: {{ match.tags.all|join:", " }}
+                                        </a>
+                                    </li>
+                                {% empty %}
+                                    <p>No matches found.</p>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="row gy-4 mt-3">
+                <!-- Notifications -->
+                <div class="col-md-2">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <span class="notifications">🔔</span>
+                            <p>Notifications</p>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- My Groups -->
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">My Groups</h5>
+                            <ul id="groupList" class="list-unstyled">
+                                {% if groups %}
+                                    {% for group in groups %}
+                                        <li>
+                                            <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
+                                            - Members: {{ group.members.count }}
+                                        </li>
+                                    {% endfor %}
+                                {% else %}
+                                    <p>You are not a member of any groups yet.</p>
+                                {% endif %}
+                            </ul>
+                            <button><a href="{% url 'groups' %}">More</a></button>
+                        </div>
+                    </div>
+                </div>
+    
+                <!-- Study Sessions -->
+                <div class="col-md-6">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Your Study Sessions</h5>
+                            <ul class="list-unstyled">
+                                {% for session in sessions %}
+                                    <li>{{ session.topic }} on {{ session.date_time }}</li>
+                                {% empty %}
+                                    <p>No sessions found.</p>
+                                {% endfor %}
+                            </ul>
+                            <button><a href="{% url 'study_sessions' %}">More</a></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+    
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 
-
-
-    </div>
-
-    <script>
-        const tagInput = document.getElementById('tag-input');
-        const tagList = document.getElementById('tag-list');
-        const tagsHidden = document.getElementById('tags-hidden');
-        const addTagButton = document.getElementById('add-tag-button');
-
-        let tags = [];
-
-        function addTag(tagValue) {
-            tagValue = tagValue.trim();
-            if (tagValue && !tags.includes(tagValue)) {
-                tags.push(tagValue);
-
-                // Add tag to the list in the UI
-                const li = document.createElement('li');
-                li.textContent = tagValue;
-                tagList.appendChild(li);
-
-                // Update the hidden input
-                tagsHidden.value = tags.join(',');
-            }
-        }
-
-        // Add tag when Enter is pressed
-        tagInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                addTag(e.target.value);
-                e.target.value = ''; // Clear the input
-            }
-        });
-
-        // Add tag when "Add" button is clicked
-        addTagButton.addEventListener('click', function () {
-            addTag(tagInput.value);
-            tagInput.value = ''; // Clear the input
-        });
-    </script>
-
-
-    <script>
-        $(document).ready(function () {
-            $('#create-topic-form').on('submit', function (e) {
-                e.preventDefault();  // Prevent form submission
-                console.log('Form is being processed');  // Log the success message
-        
-                // Collect form data
-                const formData = {
-                    name: $('#topic-name').val(),
-                    description: $('#topic-description').val(),
-                    tags: $('#tags-hidden').val(),
-                    user_id: {{ user.id }},
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                };
-        
-                // AJAX request to submit the form data
-                $.ajax({
-                    url: "{% url 'create_topic' %}",
-                    method: "POST",
-                    data: formData,
-                    success: function (response) {
-                        console.log(response); // Log the response for debugging
-        
-                        // Update the interested topics list
-                        const newTopic = `<li>${response.name} - ${response.description}</li>`;
-                        $('#interested-topics-list').append(newTopic);
-        
-                        // Clear form inputs
-                        $('#topic-name').val('');
-                        $('#topic-description').val('');
-                        $('#tags-hidden').val(''); // Clear hidden input
-                        $('#tag-list').empty();    // Clear tag list in the UI
-                    },
-                    error: function (error) {
-                        console.log(error);
-                        alert('An error occurred. Please try again.');
-                    }
-                });
-            });
-        });
-        
-    </script>
-
-
-    {% comment %} Search group {% endcomment %}
-    <script>
-        $(document).ready(function() {
-            $('#searchForm').submit(function(e) {
-                e.preventDefault();
-                const query = $('#searchInput').val();
-
-                // Send AJAX request to search groups
-                $.ajax({
-                    url: "{% url 'search_group' %}",
-                    method: "GET",
-                    data: {
-                        'q': query
-                    },
-                    success: function(data) {
-                        $('#searchResults').html(data.html);
-                    },
-                    error: function() {
-                        $('#searchResults').html('<p>Error occurred while searching.</p>');
-                    }
-                });
-            });
-
-            $(document).on('click', '.join-btn', function() {
-                const groupId = $(this).data('group-id');
-
-                // Send AJAX request to join group
-                $.ajax({
-                    url: "{% url 'join_group' %}",
-                    method: "POST",
-                    data: {
-                        'group_id': groupId,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    },
-                    success: function(data) {
-                        alert(data.message);  // Show a success message
-                    },
-                    error: function() {
-                        alert('Error joining the group.');
-                    }
-                });
-            });
-        });
-    </script>
 {% endblock %}

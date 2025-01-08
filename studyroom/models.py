@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from users.models import CustomUser
 from chatroom.models import ChatRoom
@@ -10,8 +11,9 @@ import string
 
 # Create your models here.
 
+
 def generate_unique_id():
-    return ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+    return str(uuid.uuid4())[:8]
 
 class Group(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -30,13 +32,13 @@ class Group(models.Model):
         Overrides the save method to ensure a ChatRoom is created and linked when a Group is created.
         """
         is_new = self.pk is None  # Check if this is a new group
-        super().save(*args, **kwargs)
-        if is_new:  # Only create a ChatRoom for new groups
+        if is_new:
+            # Create a ChatRoom first to avoid a second save
             chat_room = ChatRoom.objects.create(name=f"Group Chat: {self.name}")
-            chat_room.members.add(self.owner)  # Add the owner to the chatroom
+            chat_room.members.add(self.owner)
             chat_room.save()
             self.chat_room = chat_room
-            super().save(*args, **kwargs)  # Save again to link the chat_room
+        super().save(*args, **kwargs)  # Save again to link the chat_room
 
     def add_member_to_group(self, user):
         """

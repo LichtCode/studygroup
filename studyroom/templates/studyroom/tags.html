@@ -1,0 +1,51 @@
+<div>
+    <label for="tag-input">Add Tags:</label>
+    <input type="text" list="tag-options" id="tag-input" placeholder="Type a tag or select from suggestions">
+    <datalist id="tag-options">
+        {% for tag in tags %}
+            <option value="{{ tag }}"></option>
+        {% endfor %}
+    </datalist>
+    <button type="button" id="add-tag-button">Add</button>
+    <ul id="tag-list"></ul>
+    <input type="hidden" name="tags" id="tags-hidden">
+</div>
+
+<script>
+    const tagInput = document.getElementById('tag-input');
+    const tagList = document.getElementById('tag-list');
+    const tagsHidden = document.getElementById('tags-hidden');
+    const addTagButton = document.getElementById('add-tag-button');
+
+    let tags = [];
+
+    function addTag(tagValue) {
+        tagValue = tagValue.trim();
+        if (tagValue && !tags.includes(tagValue)) {
+            tags.push(tagValue);
+
+            // Add tag to the list in the UI
+            const li = document.createElement('li');
+            li.textContent = tagValue;
+            tagList.appendChild(li);
+
+            // Update the hidden input
+            tagsHidden.value = tags.join(',');
+        }
+    }
+
+    // Add tag when Enter is pressed
+    tagInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(e.target.value);
+            e.target.value = ''; // Clear the input
+        }
+    });
+
+    // Add tag when "Add" button is clicked
+    addTagButton.addEventListener('click', function () {
+        addTag(tagInput.value);
+        tagInput.value = ''; // Clear the input
+    });
+</script>

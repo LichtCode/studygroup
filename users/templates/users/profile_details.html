@@ -24,7 +24,7 @@
                         No tags added.
                     {% endfor %}
                 </p>
-                <a href="{% url 'profile_edit' user.id %}" class="edit-button">Edit Profile</a>
+                <a href="{% url 'update_profile' %}" class="edit-button">Edit Profile</a>
             {% else %}
                 <!-- Another user's profile -->
                 <h2>User Details:</h2>
