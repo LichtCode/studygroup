@@ -1,84 +1,126 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ user.username }}'s Profile</title>
-</head>
-<body>
-    <div class="profile-container">
-        <h1>{{ user.username }}'s Profile</h1>
+{% extends 'base.html' %}
+{% load static %}
 
-        <div class="profile-details">
-            {% if request.user == user %}
-                <!-- Current user's profile -->
-                <h2>Your Details:</h2>
-                <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
-                <p><strong>Username:</strong> {{ user.username }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Bio:</strong> {{ user.profile.bio }}</p>
-                <p><strong>Tags:</strong> 
-                    {% for tag in user.profile.tags.all %}
-                        <span class="tag">{{ tag }}</span>
-                    {% empty %}
-                        No tags added.
-                    {% endfor %}
-                </p>
-                <a href="{% url 'update_profile' %}" class="edit-button">Edit Profile</a>
-            {% else %}
-                <!-- Another user's profile -->
-                <h2>User Details:</h2>
-                <p><strong>Full Name:</strong> {{ user.first_name }} {{ user.last_name }}</p>
-                <p><strong>Username:</strong> {{ user.username }}</p>
-                <p><strong>Email:</strong> {{ user.email }}</p>
-                <p><strong>Bio:</strong> {{ user.profile.bio }}</p>
-                <p><strong>Tags:</strong> 
-                    {% for tag in user.profile.tags.all %}
-                        <span class="tag">{{ tag }}</span>
-                    {% empty %}
-                        No tags available.
-                    {% endfor %}
-                </p>
-                <a href="{% url 'user_chatroom' user.id %}" class="chat-button">Start Chat</a>
-            {% endif %}
-        </div>
-    </div>
+{% block title %}{{ user.username }}'s Profile{% endblock %}
 
+{% block content %}
     <style>
-        .profile-container {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 10px;
-            background-color: #f9f9f9;
-        }
-        .profile-details {
-            margin-top: 20px;
-        }
-        .edit-button, .chat-button {
-            display: inline-block;
-            margin-top: 10px;
-            padding: 10px 15px;
-            color: #fff;
-            background-color: #007bff;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .edit-button:hover, .chat-button:hover {
-            background-color: #0056b3;
-        }
-        .tag {
-            display: inline-block;
-            margin: 5px;
-            padding: 5px 10px;
-            background-color: #e1f7f5;
-            border-radius: 15px;
-            font-size: 12px;
-            color: #0e46a3;
-        }
-    </style>
-</body>
-</html>
+        /* Profile Section */
+    .profile-section {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-section img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-title {
+      font-weight: bold;
+      color: #1E0342;
+    }
+    
+    .badge {
+      font-size: 0.9rem;
+      margin-right: 5px;
+      background-color: #0E46A3;
+      color: #E1F7F5;
+      padding: 5px 10px;
+      border-radius: 12px;
+    }
+    
+    /* Footer */
+    footer {
+      background-color: #1E0342;
+      color: #E1F7F5;
+    }
+    
+    /* Buttons */
+    button {
+      text-transform: uppercase;
+    }
+    
+    button a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+      </style>
+    <div class="container mt-4">
+        <!-- Profile Overview Section -->
+        <div class="row mb-4">
+          <div class="col-md-4">
+            <div class="profile-section text-center">
+              <img src="https://via.placeholder.com/150" alt="Profile Picture" class="rounded-circle mb-3">
+              <h3>{{ request.user.username }}</h3>
+                {% if request.user == user %}
+                    <button class="btn btn-primary btn-sm mt-2" ><a href="{% url 'update_profile' %}">Edit Profile</a></button>
+                {% else %}
+                    <button class="btn btn-primary btn-sm mt-2" ><a href="{% url 'user_chatroom' user.id %}">Start Chat</a></button>
+                {% endif %}
+            </div>
+          </div>
+    
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Bio</h5>
+                <p>{{ user_profile.bio }}</p>
+              </div>
+            </div>
+          </div>
+    
+          <div class="col-md-4">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Contact Information</h5>
+                <p>Email: {{ user.contact_email }}</p>
+                <p>Phone: {{ user.contact_phone }}</p>
+                <p>Location: {{ user.location }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    
+        <!-- Activity and Badges Section -->
+        <div class="row gy-4">
+          <!-- Activity Summary -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Activity Summary</h5>
+                <ul class="list-unstyled">
+                  <li><strong>Topics Interested In:</strong> 12</li>
+                  <li><strong>Groups Joined:</strong> 5</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+    
+          <!-- Badges -->
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h5 class="card-title">Achievements & Badges</h5>
+                <div>
+                  {% for tag in user_tags %}
+                    <span class="badge">{{ tag }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div> 
+      </div>
+
+{% endblock %}

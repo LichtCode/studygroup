@@ -1,0 +1,54 @@
+<nav class="sidebar bg-dark text-white vh-100">
+    <div class="p-3">
+      <h3 class="text-center">StudyBUDDY</h3>
+      <p class="text-center text-muted">Digital Wallet</p>
+    </div>
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a href="{% url 'dashboard' %}" class="nav-link text-white active" onclick="showSection(event, 'pane1')">
+           Dashboard
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'groups' %}" class="nav-link text-white" onclick="showSection(event, 'pane2')">
+           Groups
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'topics' %}" class="nav-link text-white" onclick="showSection(event, 'pane3')">
+           Topics
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'study_sessions' %}" class="nav-link text-white" onclick="showSection(event, 'pane4')">
+           Study Sessions
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'notifications' %}" class="nav-link text-white" onclick="showSection(event, 'pane5')">
+           Notifications
+        </a>
+      </li>
+      <hr class="text-secondary">
+      <li class="nav-item">
+        <a href="{% url 'profile' user.id %}" class="nav-link text-white" onclick="showSection(event, 'pane6')">
+           Profile
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'register' %}" class="nav-link text-white" onclick="showSection(event, 'pane7')">
+           Register
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'login' %}" class="nav-link text-white" onclick="showSection(event, 'pane8')">
+           Login
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="{% url 'logout' %}" class="nav-link text-white" onclick="showSection(event, 'pane11')">
+           Log Out
+        </a>
+      </li>
+    </ul>
+  </nav>

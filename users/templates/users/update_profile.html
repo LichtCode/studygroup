@@ -1,92 +1,137 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Update Profile</title>
-    <style>
-        /* Optional CSS for better tag display */
-        #tag-list {
-            list-style-type: none;
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+      <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
             padding: 0;
-        }
-
-        #tag-list li {
-            display: inline-block;
-            margin: 5px;
-            padding: 5px 10px;
-            background-color: #e0e0e0;
-            border-radius: 5px;
-        }
-    </style>
-</head>
-<body>
-    <h1>Update Profile</h1>
-    <form method="post" id="tag-form">
-        {% csrf_token %}
-
-        <!-- Username Field -->
-        <div>
-            <label for="id_username">Username:</label>
-            <input type="text" name="username" id="id_username" value="{{ form.username.value }}">
+          }
+          
+          header {
+            background-color: #1E0342;
+            border-bottom: 4px solid #9AC8CD;
+          }
+          
+          .profile-edit-form {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+          
+          .profile-edit-form h2 {
+            color: #0E46A3;
+          }
+          
+          .form-label {
+            font-weight: bold;
+          }
+          
+          textarea, input {
+            border-radius: 10px;
+          }
+          
+          textarea:focus, input:focus {
+            outline: none;
+            box-shadow: 0 0 5px #0E46A3;
+            border-color: #0E46A3;
+          }
+          
+          button {
+            border-radius: 10px;
+          }
+          
+          footer {
+            background-color: #1E0342;
+            color: #E1F7F5;
+          }
+          
+      </style>
+    </head>
+    <body>
+      <header class="bg-dark text-white text-center py-4">
+        <h1>Update Profile</h1>
+        <p class="lead">Keep your profile up to date</p>
+      </header>
+    
+      <main class="container my-5">
+        <div class="row justify-content-center">
+          <div class="col-lg-6">
+            <div class="profile-edit-form p-4">
+              <h2 class="text-center mb-4">Edit Your Information</h2>
+              <form method="post" id="tag-form">
+                {% csrf_token %}
+    
+                <!-- Username Field -->
+                <div class="mb-3">
+                  <label for="id_username" class="form-label">Username:</label>
+                  <input 
+                    type="text" 
+                    name="username" 
+                    id="id_username" 
+                    class="form-control" 
+                    value="{{ user.username }}">
+                </div>
+    
+                <!-- Email Field -->
+                <div class="mb-3">
+                  <label for="id_email" class="form-label">Email:</label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    id="id_email" 
+                    class="form-control" 
+                    value="{{ user.email }}">
+                </div>
+    
+                <!-- Bio Field -->
+                <div class="mb-3">
+                  <label for="id_bio" class="form-label">Bio:</label>
+                  <textarea 
+                    name="bio" 
+                    id="id_bio" 
+                    class="form-control">{{ user.bio }}</textarea>
+                </div>
+                
+                <!-- Contact Phone Field -->
+                <div class="mb-3">
+                  <label for="contact" class="form-label">Phone:</label>
+                  <input
+                    type="text" 
+                    name="contact" 
+                    id="contact" 
+                    class="form-control"
+                    value="{{ user.contact_phone }}">
+                </div>
+    
+                <!-- Location Field -->
+                <div class="mb-3">
+                  <label for="location" class="form-label">Location:</label>
+                  <input 
+                    type="text"
+                    name="location" 
+                    id="location" 
+                    class="form-control"
+                    value="{{ user.location }}">
+                </div>
+    
+                <!-- Tag Input Section -->
+                <div class="mb-3">
+                  {% include 'studyroom/tags.html' with tags=tags %}
+                </div>
+    
+                <!-- Submit Button -->
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary w-100">Save Changes</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-
-        <!-- Email Field -->
-        <div>
-            <label for="id_email">Email:</label>
-            <input type="email" name="email" id="id_email" value="{{ form.email.value }}">
-        </div>
-
-        <!-- Bio Field -->
-        <div>
-            <label for="id_bio">Bio:</label>
-            <textarea name="bio" id="id_bio">{{ form.bio.value }}</textarea>
-        </div>
-        
-        <!-- Tag Input Section -->
-        <div>
-            <label for="tag-input">Add Tags:</label>
-            <input type="text" list="tag-options" id="tag-input" placeholder="Type a tag or select from suggestions">
-            <datalist id="tag-options">
-                {% for tag in tags %}
-                    <option value="{{ tag }}"></option>
-                {% endfor %}
-            </datalist>
-            <button type="button" id="add-tag-button">Add</button>
-            <ul id="tag-list"></ul>
-            <input type="hidden" name="tags" id="tags-hidden">
-        </div>
-
-        <!-- Submit Button -->
-        <button type="submit">Save Changes</button>
-    </form>
-
-    <script>
-        const tagInput = document.getElementById('tag-input');
-        const tagList = document.getElementById('tag-list');
-        const tagsHidden = document.getElementById('tags-hidden');
-
-        let tags = [];
-
-        // Add tag when Enter is pressed
-        tagInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                const tagValue = e.target.value.trim();
-                if (tagValue && !tags.includes(tagValue)) {
-                    tags.push(tagValue);
-
-                    // Add tag to the list in the UI
-                    const li = document.createElement('li');
-                    li.textContent = tagValue;
-                    tagList.appendChild(li);
-
-                    // Clear the input
-                    e.target.value = '';
-
-                    // Update the hidden input
-                    tagsHidden.value = tags.join(',');
-                }
-            }
-        });
-    </script>
-</body>
-</html>
+      </main>
+    
+{% endblock %}

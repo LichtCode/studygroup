@@ -7,15 +7,15 @@ class UserRegistrationForm(UserCreationForm):
         model = CustomUser
         fields = ['username', 'email', 'password1', 'password2']
 
-class UserTagForm(forms.ModelForm):
-    tags = forms.CharField(
-        required=False,
-        help_text="Enter tags separated by commas (e.g., Python, Django, AI)"
-    )
-
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser
-        fields = ['bio', 'tags']
+        fields = ['bio', 'tags', 'contact_phone', 'location']
+        widgets = {
+            'bio': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'contact_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'location': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
     def save(self, commit=True):
         user = super().save(commit=False)

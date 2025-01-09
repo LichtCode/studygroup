@@ -16,10 +16,12 @@ def chat_room(request, room_id):
         return redirect("dashboard")
     other_member = room.members.exclude(id=request.user.id).first()
     messages = room.messages.order_by("timestamp")
+    user = request.user
     context = {
         'room': room,
         'messages': messages,
         'other_member': other_member,
+        'user': user,
     }
     return render(request, "chatroom/chat_room.html", context)
 

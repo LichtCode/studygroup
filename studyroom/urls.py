@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import groups_list, create_topic, user_dashboard, select_topics, find_matches, group_detail, search_group, join_group, create_group, topics_list
+from .views import groups_list, create_topic, user_dashboard, select_topics, find_matches, group_detail, search_group, join_group, create_group, topics_list, dynamic_dashboard
 
 urlpatterns = [
     path('create-topic/', create_topic, name='create_topic'),
+    path('', dynamic_dashboard, name='dynamic_dashboard'),
     path('dashboard/', user_dashboard, name='dashboard'),
     path("select-topics/", select_topics, name="select_topics"),
     path("find-matches/", find_matches, name="find_matches"),

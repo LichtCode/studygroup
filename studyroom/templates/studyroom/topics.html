@@ -4,34 +4,138 @@
 {% block title %}All Topics{% endblock %}
 
 {% block content %}
+<style>
+    body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
 
-<h5 class="card-title">Your Interested Topics</h5>
-<ul id="interested-topics-list" class="list-unstyled">
-    {% for topic in user_topics %}
-        <li><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
-    {% empty %}
-        <p>No topics set yet.</p>
-    {% endfor %}
-</ul>
+header {
+  background-color: #1E0342;
+  border-bottom: 4px solid #9AC8CD;
+}
 
+.topic-section {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
 
-<h1>Create a New Topic</h1>
-<form id="create-topic-form">
-    <div>
-        <label for="topic-name">Topic Name:</label>
-        <input type="text" id="topic-name" name="name" required>
+.section-title {
+  font-size: 1.5rem;
+  color: #0E46A3;
+  margin-bottom: 15px;
+}
+
+.list-group-item {
+  border: none;
+  background: #E1F7F5;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  padding: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.list-group-item:hover {
+  background-color: #9AC8CD;
+  color: white;
+}
+
+footer {
+  background-color: #1E0342;
+}
+
+  </style>
+
+<main class="container my-5">
+    <div class="row g-4">
+      <!-- First Column -->
+      <div class="col-lg-8">
+        <!-- First Row inside the first column -->
+        <div class="row">
+          <!-- General Topics -->
+          <div class="col-lg-6">
+            <section class="topic-section">
+              <h2 class="section-title card-title">General Topics</h2>
+              <ul id="interested-topics-list" class="list-group list-unstyled">
+                  {% for topic in topics %}
+                      <li class="list-group-item"><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+                  {% empty %}
+                      <p>No topics set yet.</p>
+                  {% endfor %}
+              </ul>
+            </section>
+          </div>
+    
+          <!-- Topics of Interest -->
+          <div class="col-lg-6">
+            <section class="topic-section ">
+              <h2 class="section-title card-title">Your Topic Interests</h2>
+              <ul id="interested-topics-list" class="list-group list-unstyled">
+                  {% for topic in user_topics %}
+                      <li class="list-group-item"><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+                  {% empty %}
+                      <p>No topics set yet.</p>
+                  {% endfor %}
+              </ul>
+            </section>
+          </div>
+        </div>
+
+    
+        <!-- Second Row inside the first column -->
+        <div class="row">
+          <!-- Suggested Topics -->
+          <div class="col-lg-12 mt-2">
+            <section class="topic-section">
+              <h2 class="card-title section-title">Suggested Topics</h2>
+              <ul id="interested-topics-list" class="list-unstyled list-group">
+                  {% for topic in suggested_topics %}
+                      <li class="list-group-item"><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+                  {% empty %}
+                      <p>No topics set yet.</p>
+                  {% endfor %}
+            </ul>
+            </section>
+          </div>
+        </div>
+      </div>
+    
+      <!-- Second Column -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm p-4">
+          <h2 class="text-center mb-4">Create a New Topic</h2>
+          <form id="create-topic-form">
+            <!-- Name of Topic -->
+            <div class="mb-3">
+              <label for="topic-name" class="form-label">Name of Topic</label>
+              <input type="text" id="topic-name" name="name" class="form-control form-control-sm" placeholder="Enter topic name" required>
+            </div>
+    
+            <!-- Description -->
+            <div class="mb-3">
+              <label for="description" class="form-label">Description</label>
+              <textarea id="topic-description" name="description" class="form-control form-control-sm" rows="2" placeholder="Enter topic description"></textarea>
+            </div>
+    
+            <!-- Tags Selection -->
+            <div class="mb-3">
+              {% include 'studyroom/tags.html' with tags=tags %}
+            </div>
+    
+            <!-- Submit Button -->
+            <div class="text-center">
+              <button type="submit" class="btn btn-success btn-sm">Post Topic</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div>
-        <label for="topic-description">Description:</label>
-        <textarea id="topic-description" name="description" rows="4"></textarea>
-    </div>
-
-    <!-- Tag Input Section -->
-    {% include 'studyroom/tags.html' with tags=tags %}
-
-    <button type="submit">Post Topic</button>
-</form>
-
+    
+  </main>
 
 
 <script>

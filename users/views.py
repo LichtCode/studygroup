@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .forms import UserRegistrationForm
 from .models import CustomUser
 from django.contrib.auth.decorators import login_required
-from .forms import UserTagForm
+from .forms import UserProfileForm
 from django.contrib.auth import authenticate, logout, login as auth_login
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -38,16 +38,22 @@ def login(request):
 
 def profile_detail(request, user_id):
     user = get_object_or_404(CustomUser, id=user_id)
-    return render(request, 'users/profile_details.html', {'user': user})
+    tags = user.tags.all()
+    context = {
+        'user': user,
+        "user_tags": tags
+    }
+    return render(request, 'users/profile_details.html', context)
 
 @login_required
 def update_profile(request):
     user = request.user
     if request.method == 'POST':
-        form = UserTagForm(request.POST, instance=user)
+        form = UserProfileForm(request.POST, instance=user)
         if form.is_valid():
             form.save()
-            return redirect('profile')  # Redirect to a profile or another page
+            return redirect('profile')
     else:
-        form = UserTagForm(instance=user)
-    return render(request, 'users/update_profile.html', {'form': form})
+        form = UserProfileForm(instance=user)
+    return render(request, 'users/update_profile.html', {'form': form,
+                                                         "user": user})

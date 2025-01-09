@@ -1,14 +1,78 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Notifications</title>
-</head>
-<body>
-    <h1>Notifications</h1>
-    <ul>
-        {% for notification in notifications %}
-            <li>{{ notification.message }}</li>
-        {% endfor %}
-    </ul>
-</body>
-</html>
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+      }
+      
+      header {
+        background-color: #1E0342;
+        border-bottom: 4px solid #9AC8CD;
+      }
+      
+      #notifications {
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      
+      #notifications h2 {
+        color: #0E46A3;
+      }
+      
+      .list-group-item {
+        border: none;
+        padding: 15px 20px;
+        font-size: 1rem;
+      }
+      
+      .list-group-item + .list-group-item {
+        border-top: 1px solid #e9ecef;
+      }
+      
+      .list-group-item i {
+        font-size: 1.5rem;
+      }
+      
+      .text-primary {
+        color: #0E46A3 !important;
+      }
+      
+      footer {
+        background-color: #1E0342;
+        color: #E1F7F5;
+      }
+      
+</style>
+<main class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div id="notifications" class="p-4 shadow-sm rounded">
+          <h2 class="mb-4 text-center">Your Notifications</h2>
+          <ul class="list-group">
+            <!-- Notification Items -->
+            {% for notification in notifications %}
+              <li class="list-group-item d-flex align-items-center">
+                <i class="bi bi-bell-fill me-3 text-primary"></i>
+                <span>{{ notification.message }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted text-center">
+                <i class="bi bi-info-circle me-2"></i>
+                No notifications available.
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

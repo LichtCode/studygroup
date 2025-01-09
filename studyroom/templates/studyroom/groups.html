@@ -4,46 +4,124 @@
 {% block title %}My Groups{% endblock %}
 
 {% block content %}
+<style>
+    body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 0;
+  padding: 0;
+}
 
-<h5 class="card-title">My Groups</h5>
-<ul id="groupList" class="list-unstyled">
-    {% if user_groups %}
-        {% for group in user_groups %}
-            <li>
-                <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
-                - Members: {{ group.members.count }}
-            </li>
-        {% endfor %}
-    {% else %}
-        <p>You are not a member of any groups yet.</p>
-    {% endif %}
-</ul>
+header {
+  background-color: #1E0342;
+  border-bottom: 4px solid #9AC8CD;
+}
 
-<h1>Create a New Group</h1>
-<form id="create-group-form" method="post">
-    {% csrf_token %}
-    <label for="group-name">Group Name:</label>
-    <input type="text" id="group-name" name="name" required>
+.group-section {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
 
-    <label for="group-description">Description:</label>
-    <textarea id="group-description" name="description" placeholder="Optional"></textarea>
+.card-title {
+  font-size: 1.5rem;
+  color: #0E46A3;
+  margin-bottom: 15px;
+}
 
-    {% include 'studyroom/tags.html' with tags=tags %}
+form input, form textarea {
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
 
-    <button type="submit">Create Group</button>
-</form>
+form button {
+  background-color: #0E46A3;
+  border: none;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
 
-<div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+form button:hover {
+  background-color: #1E0342;
+}
 
-<h2>Search for a Group</h2>
-<form id="searchForm">
-    <input type="text" id="searchInput" placeholder="Enter group name or ID" required>
-    <button type="submit">Search</button>
-</form>
+footer {
+  background-color: #1E0342;
+}
 
-<div id="searchResults">
-    <!-- Search results will appear here -->
-</div>
+  </style>
+
+<main class="container my-5">
+    <div class="row g-4">
+      <!-- First Column: Create a New Group -->
+      <div class="col-lg-6">
+        <section class="group-section">
+          <h1>Create a New Group</h1>
+          <form id="create-group-form" method="post">
+            <label for="group-name" class="form-label">Group Name:</label>
+            <input type="text" id="group-name" name="name" class="form-control mb-3" required>
+    
+            <label for="group-description" class="form-label">Description:</label>
+            <textarea id="group-description" name="description" class="form-control mb-3" placeholder="Optional"></textarea>
+    
+            <!-- Tags Selection -->
+            <div class="mb-3">
+              {% include 'studyroom/tags.html' with tags=tags %}
+            </div>
+    
+            <button type="submit" class="btn btn-primary w-100">Create Group</button>
+          </form>
+          <div id="response-message" style="margin-top: 20px; color: green; font-weight: bold;"></div>
+        </section>
+      </div>
+    
+      <!-- Second Column -->
+      <div class="col-lg-6">
+        <!-- First Row: Search for a Group -->
+        <div class="row mb-4">
+          <div class="col-12">
+            <section class="group-section">
+              <h2>Search for a Group</h2>
+              <form id="searchForm">
+                <div class="input-group mb-3">
+                  <input type="text" id="searchInput" class="form-control" placeholder="Enter group name or ID" required>
+                  <button type="submit" class="btn btn-outline-primary">Search</button>
+                </div>
+              </form>
+              <div id="searchResults">
+                <!-- Search results will appear here -->
+              </div>
+            </section>
+          </div>
+        </div>
+    
+        <!-- Second Row: My Groups -->
+        <div class="row">
+          <div class="col-12">
+            <section class="group-section">
+              <h5 class="card-title">My Groups</h5>
+              <ul id="groupList" class="list-unstyled">
+                  {% if user_groups %}
+                      {% for group in user_groups %}
+                          <li>
+                              <a href="{% url 'group_detail' group.id %}">{{ group.name }}</a>
+                              - Members: {{ group.members.count }}
+                          </li>
+                      {% endfor %}
+                  {% else %}
+                      <p>You are not a member of any groups yet.</p>
+                  {% endif %}
+              </ul>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 
 
     {% comment %} Search group {% endcomment %}

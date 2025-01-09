@@ -18,27 +18,70 @@ def user_dashboard(request):
     user_tags = user.tags.all()
     matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
     groups = user.study_groups.all()
-    for match in matches:
-        print(match.username, match.id)
+
     context = {
         "sessions": sessions,
         "user_tags": user_tags,
         "user_topics": user_topics,
         "user": user,
         "matches": matches,
-        'groups': groups
+        'groups': groups,
     }
     return render(request, 'studyroom/dashboard.html', context)
 
+@login_required
+def dynamic_dashboard(request):
+    #general
+    user = request.user
+    user_topics = request.user.interested_topics.all() # dashboard topics
+    user_tags = user.tags.all() # dashboard topic
+    tags = Tag.objects.all() # groups topic
+    # dashboard
+    
+    matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
+    groups = user.study_groups.all()
+
+    #Groups
+    user_groups = request.user.study_groups.all()
+
+    #topic
+    topics = Topic.objects.all()
+    topic_matches = Topic.objects.filter(tags__in=user_tags).distinct()
+
+    #notification
+    user_notifications = request.user.notifications.filter(is_read=False)
+
+    #sessions
+    sessions = request.user.sessions.all()
+
+    context = {
+        "user_groups": user_groups,
+        "sessions": sessions,
+        "user_tags": user_tags,
+        "user_topics": user_topics,
+        "user": user,
+        "matches": matches,
+        'groups': groups,
+        "tags": tags,
+        "topics": topics,
+        "suggested_topics": topic_matches,
+        "notifications": user_notifications,
+    }
+    return render(request, 'studyroom/dynamic_dashboard.html', context)
 
 @login_required
 def topics_list(request):
     user_topics = request.user.interested_topics.all()
+    topics = Topic.objects.all()
     tags = Tag.objects.all()
+    user_tags = request.user.tags.all()
+    topic_matches = Topic.objects.filter(tags__in=user_tags).distinct()
 
     context = {
         "user_topics": user_topics,
         "tags": tags,
+        "topics": topics,
+        "suggested_topics": topic_matches,
     }
     return render(request, 'studyroom/topics.html', context)
 

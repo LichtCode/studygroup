@@ -1,81 +1,123 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ group.name }} - Group Details</title>
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ group.name }} - Group Details{% endblock %}
+
+{% block content %}
     <style>
         body {
             font-family: Arial, sans-serif;
-            line-height: 1.6;
-            margin: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            color: #333;
-        }
-        .tags span {
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+          }
+          
+          header {
+            background-color: #1E0342;
+            border-bottom: 4px solid #9AC8CD;
+          }
+          
+          h1 {
+            font-weight: bold;
+          }
+          
+          h2 {
+            font-weight: bold;
+            margin-bottom: 10px;
+          }
+          
+          .bg-white {
+            background-color: #ffffff;
+          }
+          
+          .shadow-sm {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          }
+          
+          .tags span {
             display: inline-block;
-            background: #f1f1f1;
-            color: #555;
             padding: 5px 10px;
-            border-radius: 5px;
-            margin-right: 5px;
-        }
-        .members-list {
-            margin-top: 10px;
-        }
-        .chatroom-button {
-            display: inline-block;
-            background: #007bff;
-            color: #fff;
+            font-size: 0.9rem;
+            border-radius: 20px;
+            color: #ffffff;
+          }
+          
+          .tags .badge {
+            background-color: #0E46A3;
+          }
+          
+          .list-group-item {
+            border: none;
             padding: 10px 15px;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
-        .chatroom-button:hover {
-            background: #0056b3;
-        }
+          }
+          
+          .list-group-item + .list-group-item {
+            border-top: 1px solid #e9ecef;
+          }
+          
+          .btn-primary {
+            background-color: #0E46A3;
+            border: none;
+          }
+          
+          .btn-primary:hover {
+            background-color: #1E0342;
+          }
+          
+          footer {
+            background-color: #1E0342;
+            color: #E1F7F5;
+          }
+          
     </style>
-</head>
-<body>
-    <div class="container">
-        <h1>{{ group.name }}</h1>
-        <p><strong>Description:</strong> {{ group.description }}</p>
-        <p><strong>Owner:</strong> {{ group.owner.username }}</p>
-        <div>
+  <!-- Main Content -->
+  <main class="container my-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <!-- Group Details Card -->
+        <div class="p-4 shadow-sm rounded bg-white">
+          <h2 class="text-center text-primary">{{ group.name }}</h2>
+          <p class="text-muted"><strong>Description:</strong> {{ group.description }}</p>
+          <p><strong>Owner:</strong> <span class="text-info">{{ group.owner.username }}</span></p>
+          
+          <!-- Tags Section -->
+          <div class="my-3">
             <strong>Tags:</strong>
-            <div class="tags">
-                {% for tag in group.tags.all %}
-                    <span>{{ tag.name }}</span>
-                {% empty %}
-                    <span>No tags available</span>
-                {% endfor %}
+            <div class="tags d-flex flex-wrap mt-2">
+              {% for tag in group.tags.all %}
+                <span class="badge bg-primary me-2 mb-2">{{ tag.name }}</span>
+              {% empty %}
+                <span class="text-muted">No tags available</span>
+              {% endfor %}
             </div>
-        </div>
-        <div>
+          </div>
+
+          <!-- Members Section -->
+          <div class="my-3">
             <strong>Members:</strong>
-            <ul class="members-list">
-                {% for member in group.members.all %}
-                    <li>{{ member.username }}</li>
-                {% empty %}
-                    <li>No members yet</li>
-                {% endfor %}
+            <ul class="list-group mt-2">
+              {% for member in group.members.all %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  {{ member.username }}
+                </li>
+              {% empty %}
+                <li class="list-group-item text-muted">No members yet</li>
+              {% endfor %}
             </ul>
+          </div>
+
+          <!-- Chatroom Section -->
+          {% if group.chat_room %}
+            <div class="text-center mt-4">
+              <a href="{% url 'chat_room' group.chat_room.id %}" class="btn btn-primary">
+                Go to Chatroom
+              </a>
+            </div>
+          {% else %}
+            <p class="text-center text-muted mt-4">No chatroom available for this group.</p>
+          {% endif %}
         </div>
-        {% if group.chat_room %}
-            <a href="{% url 'chat_room' group.chat_room.id %}" class="chatroom-button">Go to Chatroom</a>
-        {% else %}
-            <p>No chatroom available for this group.</p>
-        {% endif %}
+      </div>
     </div>
-</body>
-</html>
+  </main>
+{% endblock %}

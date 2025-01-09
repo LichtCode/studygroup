@@ -1,15 +1,19 @@
 <div>
-    <label for="tag-input">Add Tags:</label>
-    <input type="text" list="tag-options" id="tag-input" placeholder="Type a tag or select from suggestions">
+    <label for="tag-input" class="form-label">Select Tags</label>
+    <input type="text" list="tag-options" class="form-control form-control" id="tag-input" placeholder="Choose or type a tag">
+    <button type="button" id="add-tag-button" class="btn btn-sm btn-primary">Add</button>
     <datalist id="tag-options">
         {% for tag in tags %}
             <option value="{{ tag }}"></option>
         {% endfor %}
     </datalist>
-    <button type="button" id="add-tag-button">Add</button>
-    <ul id="tag-list"></ul>
+    <div class="mb-3">
+        <label class="form-label">Selected Tags</label>
+        <div id="tag-list">
+        </div>
+      </div>
     <input type="hidden" name="tags" id="tags-hidden">
-</div>
+  </div>
 
 <script>
     const tagInput = document.getElementById('tag-input');
