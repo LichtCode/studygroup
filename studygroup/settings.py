@@ -24,10 +24,14 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-)ck=ku2e%myor0%1r1fw*zbc6=n8evmto%pa8ipt#c6mvith5!'
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://f85c-105-112-11-192.ngrok-free.app'
+]
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["f85c-105-112-11-192.ngrok-free.app", "127.0.0.1"]
 
 
 # Application definition

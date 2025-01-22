@@ -29,45 +29,44 @@ def user_dashboard(request):
     }
     return render(request, 'studyroom/dashboard.html', context)
 
-@login_required
-def dynamic_dashboard(request):
-    #general
-    user = request.user
-    user_topics = request.user.interested_topics.all() # dashboard topics
-    user_tags = user.tags.all() # dashboard topic
-    tags = Tag.objects.all() # groups topic
-    # dashboard
+def landing_page(request):
+    # #general
+    # user = request.user
+    # user_topics = request.user.interested_topics.all() # dashboard topics
+    # user_tags = user.tags.all() # dashboard topic
+    # tags = Tag.objects.all() # groups topic
+    # # dashboard
     
-    matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
-    groups = user.study_groups.all()
+    # matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
+    # groups = user.study_groups.all()
 
-    #Groups
-    user_groups = request.user.study_groups.all()
+    # #Groups
+    # user_groups = request.user.study_groups.all()
 
-    #topic
-    topics = Topic.objects.all()
-    topic_matches = Topic.objects.filter(tags__in=user_tags).distinct()
+    # #topic
+    # topics = Topic.objects.all()
+    # topic_matches = Topic.objects.filter(tags__in=user_tags).distinct()
 
-    #notification
-    user_notifications = request.user.notifications.filter(is_read=False)
+    # #notification
+    # user_notifications = request.user.notifications.filter(is_read=False)
 
-    #sessions
-    sessions = request.user.sessions.all()
+    # #sessions
+    # sessions = request.user.sessions.all()
 
-    context = {
-        "user_groups": user_groups,
-        "sessions": sessions,
-        "user_tags": user_tags,
-        "user_topics": user_topics,
-        "user": user,
-        "matches": matches,
-        'groups': groups,
-        "tags": tags,
-        "topics": topics,
-        "suggested_topics": topic_matches,
-        "notifications": user_notifications,
-    }
-    return render(request, 'studyroom/dynamic_dashboard.html', context)
+    # context = {
+    #     "user_groups": user_groups,
+    #     "sessions": sessions,
+    #     "user_tags": user_tags,
+    #     "user_topics": user_topics,
+    #     "user": user,
+    #     "matches": matches,
+    #     'groups': groups,
+    #     "tags": tags,
+    #     "topics": topics,
+    #     "suggested_topics": topic_matches,
+    #     "notifications": user_notifications,
+    # }
+    return render(request, 'studyroom/landing-page.html')
 
 @login_required
 def topics_list(request):
@@ -88,6 +87,7 @@ def topics_list(request):
 
 @csrf_exempt
 def create_topic(request):
+    print("Create topic got CLICKED")
     if request.method == "POST":
         name = request.POST.get('name')
         description = request.POST.get('description')

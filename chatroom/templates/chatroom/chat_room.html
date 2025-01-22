@@ -200,8 +200,11 @@
         chatSocket.onmessage = function(e) {
             console.log("Received message from chat room");
             const data = JSON.parse(e.data);
+
+            const currentUser = "{{ request.user.username }}";
+            const side = data.username === currentUser ? "right" : "left";
+
             const messagesDiv = document.getElementById("messages");
-            let side = "right";
             const newMessage = `
             <div class="chat-bubble chat-bubble-${side}">
                 ${data.message}

@@ -62,6 +62,7 @@ footer {
         <section class="group-section">
           <h1>Create a New Group</h1>
           <form id="create-group-form" method="post">
+            {% csrf_token %}
             <label for="group-name" class="form-label">Group Name:</label>
             <input type="text" id="group-name" name="name" class="form-control mb-3" required>
     
@@ -155,8 +156,8 @@ footer {
                     url: "{% url 'join_group' %}",
                     method: "POST",
                     data: {
-                        'group_id': groupId,
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                      'group_id': groupId,
+                      'csrfmiddlewaretoken': "{{ csrf_token }}"
                     },
                     success: function(data) {
                         const newGroup = `
