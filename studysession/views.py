@@ -6,6 +6,27 @@ from chatroom.models import ChatRoom
 
 @login_required
 def schedule_session(request):
+    """
+    Schedule a new study session for a given chat room.
+
+    **Request data**
+
+        topic (str): the topic of the study session
+        date_time (datetime): the date and time of the study session
+        room_id (int): the ID of the chat room to schedule the study session for
+
+    **Returns**
+
+        A JSON response with a message indicating the success or failure of the
+        operation. If the request is successful, a message of 'Study session
+        scheduled successfully!' is returned. Otherwise, an appropriate error
+        message is returned.
+
+    **Status codes**
+
+        200: the request was successful
+        405: the request method was invalid (only POST is allowed)
+    """
     print(request.user)
     if request.method == "POST":
         topic = request.POST["topic"]
@@ -27,10 +48,23 @@ def schedule_session(request):
 
 @login_required
 def notifications(request):
+    """
+    Show all unread notifications for the user.
+
+    **Context**
+        notifications: a list of Notification objects that the user has not read
+    """
     user_notifications = request.user.notifications.filter(is_read=False)
     return render(request, "studysession/notifications.html", {"notifications": user_notifications})
 
 @login_required
 def study_sessions(request):
+    """
+    Show all study sessions that the user is a part of.
+
+    **Context**
+        sessions: a list of StudySession objects that the user is a part of
+    """
+
     sessions = request.user.sessions.all()
     return render(request, "studysession/study_sessions.html", {"sessions": sessions})
