@@ -1,7 +1,7 @@
-# Virtual Study Group Connector
+# Study Buddy
 
 ## Overview
-The **Virtual Study Group Connector** is a web-based platform designed to bring students together based on shared academic interests. It serves as a solution for individuals struggling to find like-minded peers for collaborative study sessions. The platform leverages modern web technologies to enable seamless interaction, real-time communication, and efficient collaboration for educational success.
+The **Study Buddy** is a web-based platform designed to bring students together based on shared academic interests. It serves as a solution for individuals struggling to find like-minded peers for collaborative study sessions. The platform leverages modern web technologies to enable seamless interaction, real-time communication, and efficient collaboration for educational success.
 
 ---
 
@@ -18,7 +18,7 @@ The **Virtual Study Group Connector** is a web-based platform designed to bring 
 ---
 
 ## Project Goals
-The primary goals of the Virtual Study Group Connector are:
+The primary goals of the Study Buddy are:
 
 1. **Facilitating Collaboration:** Provide students with a platform to connect with peers who share similar academic goals or interests.
 2. **Efficient Communication:** Enable real-time messaging for seamless interaction within study groups.
@@ -69,7 +69,7 @@ The primary goals of the Virtual Study Group Connector are:
 - **SQL:** Manages relational data, including user profiles, tags, groups, and chat messages.
 
 ### 4. Third-Party Tools
-- **Redis:** Serves as the message broker for Django Channels.
+- **Redis:** Serves as the message broker for Django Channels.(Live)
 - **UUID:** Generates human-readable unique IDs for groups.
 
 ---
@@ -134,7 +134,7 @@ The primary goals of the Virtual Study Group Connector are:
 - Messages are stored in the database for persistence.
 
 ### Notifications
-- Email and in-app notifications inform users of important updates, such as upcoming study sessions or group invitations.
+- In-app notifications inform users of important updates, such as upcoming study sessions or group invitations.
 
 ---
 
@@ -147,7 +147,7 @@ Implementing real-time chat required handling WebSocket connections and ensuring
 Creating a robust matching algorithm that balances accuracy and performance posed initial difficulties.
 
 ### 3. User Experience
-Ensuring a seamless user experience, particularly with dynamic tag input and group management, required iterative testing and refinement.
+Managing user-generated content particularly with dynamic tag input and group management.
 
 ---
 
@@ -160,7 +160,7 @@ Designing a scalable architecture early on prevented bottlenecks as features exp
 Integrating WebSocket-based features enhanced understanding of real-time technologies.
 
 ### 3. User Feedback
-Incorporating feedback during testing improved the usability of the platform significantly.
+User-centric design is critical for feature adoption and usability.
 
 ---
 
@@ -175,11 +175,11 @@ Integrate machine learning to provide more accurate user and group recommendatio
 ### 3. Moderation Tools
 Add tools for managing user-generated content, such as reporting and moderation of inappropriate tags or messages.
 
-### 5. Calendar Integration
+### 4. Calendar Integration
 Allow users to integrate their schedules with platforms like Google Calendar for streamlined session planning.
 
 ---
 
 ## Conclusion
-The Virtual Study Group Connector bridges the gap between students seeking collaborative learning environments. By leveraging robust technologies, user-centric design, and scalable architecture, the platform delivers a powerful tool for academic success. Future enhancements will continue to refine and expand the platform, ensuring it meets the evolving needs of its users.
+The Study Buddy bridges the gap between students seeking collaborative learning environments. By leveraging robust technologies, user-centric design, and scalable architecture, the platform delivers a powerful tool for academic success. Future enhancements will continue to refine and expand the platform, ensuring it meets the evolving needs of its users.
 
