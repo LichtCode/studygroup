@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ user.username }}'s Tags{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h3>Add Tags to Profile</h3>
+    <form method="POST" action="{% url 'add_tags' user_id=user.id %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="tag-input" class="form-label">Select Tags</label>
+            <input type="text" list="tag-options" class="form-control" id="tag-input" placeholder="Choose or type a tag">
+            <button type="button" id="add-tag-button" class="btn btn-sm btn-primary mt-2">Add</button>
+            <datalist id="tag-options">
+                {% for tag in tags %}
+                    <option value="{{ tag }}"></option>
+                {% endfor %}
+            </datalist>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Selected Tags</label>
+            <div id="tag-list" class="border p-2 mb-3">
+                <!-- Dynamically added tags will appear here -->
+            </div>
+        </div>
+        <input type="hidden" name="tags" id="tags-hidden" value="{{ user_tags }}">
+        <button type="submit" class="btn btn-success">Save Tags</button>
+    </form>
+</div>
+
+
+<script>
+    const tagInput = document.getElementById('tag-input');
+    const tagList = document.getElementById('tag-list');
+    const tagsHidden = document.getElementById('tags-hidden');
+    const addTagButton = document.getElementById('add-tag-button');
+
+    // Initially set the tags from the hidden input field (if any)
+    let tags = tagsHidden.value ? tagsHidden.value.split(',') : [];
+
+    function updateTagsUI() {
+        // Clear the existing tags in the UI
+        tagList.innerHTML = '';
+
+        // Loop through the tags and display them in the UI
+        tags.forEach(tag => {
+            const li = document.createElement('li');
+            li.textContent = tag;
+            
+            // Create the remove button
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'x';
+            removeButton.classList.add('btn', 'btn-sm', 'btn-danger', 'ml-2', 'm-2');
+            removeButton.addEventListener('click', function () {
+                removeTag(tag);
+            });
+
+            li.appendChild(removeButton);
+            tagList.appendChild(li);
+        });
+
+        // Update the hidden input field with the tags
+        tagsHidden.value = tags.join(',');
+    }
+
+    function addTag(tagValue) {
+        tagValue = tagValue.trim();
+        if (tagValue && !tags.includes(tagValue)) {
+            tags.push(tagValue);
+            updateTagsUI();
+        }
+    }
+
+    function removeTag(tagValue) {
+        tags = tags.filter(tag => tag !== tagValue);
+        updateTagsUI();
+    }
+
+    // Add tag when Enter is pressed
+    tagInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addTag(e.target.value);
+            e.target.value = ''; // Clear the input
+        }
+    });
+
+    // Add tag when "Add" button is clicked
+    addTagButton.addEventListener('click', function () {
+        addTag(tagInput.value);
+        tagInput.value = ''; // Clear the input
+    });
+
+    // Initialize the tags UI when the page loads
+    updateTagsUI();
+</script>
+
+{% endblock %}

@@ -32,10 +32,10 @@
     
     .badge {
       font-size: 0.9rem;
-      margin-right: 5px;
+      margin: 5px;
       background-color: #0E46A3;
       color: #E1F7F5;
-      padding: 5px 10px;
+      padding: 10px 20px;
       border-radius: 12px;
     }
     
@@ -61,8 +61,8 @@
         <div class="row mb-4">
           <div class="col-md-4">
             <div class="profile-section text-center">
-              <img src="https://via.placeholder.com/150" alt="Profile Picture" class="rounded-circle mb-3">
-              <h3>{{ request.user.username }}</h3>
+              <img src="https://picsum.photos/200" alt="Profile Picture" class="rounded-circle mb-3">
+              <h3>{{ user.username }}</h3>
                 {% if request.user == user %}
                     <button class="btn btn-primary btn-sm mt-2" ><a href="{% url 'update_profile' %}">Edit Profile</a></button>
                 {% else %}
@@ -75,7 +75,7 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">Bio</h5>
-                <p>{{ user_profile.bio }}</p>
+                <p>{{ user.bio }}</p>
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@
             <div class="card h-100">
               <div class="card-body">
                 <h5 class="card-title">Contact Information</h5>
-                <p>Email: {{ user.contact_email }}</p>
+                <p>Email: {{ user.email }}</p>
                 <p>Phone: {{ user.contact_phone }}</p>
                 <p>Location: {{ user.location }}</p>
               </div>
@@ -100,8 +100,8 @@
               <div class="card-body">
                 <h5 class="card-title">Activity Summary</h5>
                 <ul class="list-unstyled">
-                  <li><strong>Topics Interested In:</strong> 12</li>
-                  <li><strong>Groups Joined:</strong> 5</li>
+                  <li><strong>Topics Interested In:</strong> {{ user.interested_topics.count }}</li>
+                  <li><strong>Groups Joined:</strong> {{ user.study_groups.count }}</li>
                 </ul>
               </div>
             </div>
@@ -111,12 +111,15 @@
           <div class="col-md-6">
             <div class="card h-100">
               <div class="card-body">
-                <h5 class="card-title">Achievements & Badges</h5>
+                <h5 class="card-title">User Tags</h5>
                 <div>
                   {% for tag in user_tags %}
-                    <span class="badge">{{ tag }}</span>
+                    <span class="badge m-2">{{ tag }}</span>
                   {% endfor %}
                 </div>
+                {% if request.user == user %}
+                  <button class="btn btn-primary btn-sm my-2" ><a href="{% url 'add_tags' user_id=user.id %}">Edit Tags</a></button>
+                {% endif %}
               </div>
             </div>
           </div>

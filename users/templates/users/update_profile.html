@@ -69,60 +69,37 @@
                 <!-- Username Field -->
                 <div class="mb-3">
                   <label for="id_username" class="form-label">Username:</label>
-                  <input 
-                    type="text" 
-                    name="username" 
-                    id="id_username" 
-                    class="form-control" 
-                    value="{{ user.username }}">
+                  {{ form.username }}
+                  <div class="text-danger">{{ form.username.errors }}</div>
                 </div>
     
                 <!-- Email Field -->
                 <div class="mb-3">
                   <label for="id_email" class="form-label">Email:</label>
-                  <input 
-                    type="email" 
-                    name="email" 
-                    id="id_email" 
-                    class="form-control" 
-                    value="{{ user.email }}">
+                  {{ form.email }}
+                  <div class="text-danger">{{ form.email.errors }}</div>
                 </div>
     
                 <!-- Bio Field -->
                 <div class="mb-3">
                   <label for="id_bio" class="form-label">Bio:</label>
-                  <textarea 
-                    name="bio" 
-                    id="id_bio" 
-                    class="form-control">{{ user.bio }}</textarea>
+                  {{ form.bio }}
+                  <div class="text-danger">{{ form.bio.errors }}</div>
                 </div>
                 
                 <!-- Contact Phone Field -->
                 <div class="mb-3">
-                  <label for="contact" class="form-label">Phone:</label>
-                  <input
-                    type="text" 
-                    name="contact" 
-                    id="contact" 
-                    class="form-control"
-                    value="{{ user.contact_phone }}">
+                  <label for="id_contact_phone" class="form-label">Contact Phone:</label>
+                  {{ form.contact_phone }}
+                  <div class="text-danger">{{ form.contact_phone.errors }}</div>
                 </div>
     
                 <!-- Location Field -->
-                <div class="mb-3">
-                  <label for="location" class="form-label">Location:</label>
-                  <input 
-                    type="text"
-                    name="location" 
-                    id="location" 
-                    class="form-control"
-                    value="{{ user.location }}">
-                </div>
-    
-                <!-- Tag Input Section -->
-                <div class="mb-3">
-                  {% include 'studyroom/tags.html' with tags=tags %}
-                </div>
+                 <div class="mb-3">
+                    <label for="id_location" class="form-label">Location:</label>
+                    {{ form.location }}
+                    <div class="text-danger">{{ form.location.errors }}</div>
+                `</div>
     
                 <!-- Submit Button -->
                 <div class="text-center">

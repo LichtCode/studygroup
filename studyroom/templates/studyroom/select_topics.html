@@ -1,108 +1,123 @@
-<style>
-    body {
-        font-family: Arial, sans-serif;
-    }
+{% if user.tags.count < 0 %}
+    <style>
 
-    .hidden {
-        display: none;
-    }
+        .hidden {
+            display: none;
+        }
 
-    .blur {
-        filter: blur(5px);
-        pointer-events: none;
-    }
+        .blur {
+            filter: blur(5px);
+            pointer-events: none;
+        }
 
-    .interest-modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: seashell;
-        padding: 50px;
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        z-index: 1000;
-    }
+        .interest-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 50px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
 
-    #overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-</style>
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
 
-<div id="overlay" class="hidden"></div>
+    <div id="overlay" class="hidden"></div>
 
-<div id="interest-modal" class="interest-modal hidden">
-    <!-- Interest Section -->
-    <h1>Select Topics of Interest</h1>
-    <form id="interest-form">
-        {% csrf_token %}
-        <ul>
-            {% for tag in tags %}
-                <li>
-                    <input type="checkbox" name="tags" value="{{ tag.id }}"
-                           {% if tag in user_tags %}checked{% endif %}>
-                    {{ tag.name }}
-                </li>
-            {% endfor %}
-        </ul>
-        <button type="submit">Save Topics</button>
-    </form>
-</div>
+    <div id="interest-modal" class="interest-modal hidden bg-light shadow-sm">
+        <!-- Interest Section -->
+        <h1>Select Topics of Interest</h1>
+        <form id="interest-form" class="p-4 border rounded bg-light shadow-sm">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label class="form-label fw-bold">Select Topics of Interest</label>
+                <div class="form-check">
+                    {% for tag in tags %}
+                        <div class="form-check">
+                            <input 
+                                class="form-check-input" 
+                                type="checkbox" 
+                                name="tags" 
+                                id="tag-{{ tag.id }}" 
+                                value="{{ tag.id }}"
+                                {% if tag in user_tags %}checked{% endif %}>
+                            <label class="form-check-label" for="tag-{{ tag.id }}">
+                                {{ tag.name }}
+                            </label>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Save Topics</button>
+        </form>
+        
+    </div>
 
-<script>
-    // Show the modal after 30 seconds
-    setTimeout(() => {
-        document.getElementById('interest-modal').classList.remove('hidden');
-        document.getElementById('overlay').classList.remove('hidden');
-        document.getElementById('main-content').classList.add('blur');
-    }, 30000);
+    <script>
+        // Show the modal after 30 seconds
+        setTimeout(() => {
+            document.getElementById('interest-modal').classList.remove('hidden');
+            document.getElementById('overlay').classList.remove('hidden');
+            document.getElementById('main-div').classList.add('blur');
+        }, 3000);
 
-    // Handle form submission via AJAX
-    $(document).ready(function () {
-        $('#interest-form').on('submit', function (e) {
-            e.preventDefault(); // Prevent default form submission behavior
-    
-            // Collect the form data
-            const formData = {
-                tags: $('input[name="tags"]:checked').map(function () {
-                    return this.value;
-                }).get(), // Get values of all checked checkboxes
-                csrfmiddlewaretoken: '{{ csrf_token }}' // Include CSRF token
-            };
-    
-            // Send the AJAX request
-            $.ajax({
-                url: "{% url 'select_topics' %}", // URL for the view
-                method: "POST", // HTTP method
-                data: formData, // Data to send
-                success: function (response) {
-                    console.log(response); // Debug response
-    
-                    if (response.message) {
-                        // Hide the modal and remove blur effect
-                        $('#interest-modal').addClass('hidden');
-                        $('#overlay').addClass('hidden');
-                        $('#main-content').removeClass('blur');
-    
-                        // Optional: Show a success message
-                        console.log(response.message);
-                    } else {
-                        alert('An unexpected error occurred.');
+        // Handle form submission via AJAX
+        $(document).ready(function () {
+            $('#interest-form').on('submit', function (e) {
+                e.preventDefault(); // Prevent default form submission behavior
+                
+                const checkedOptions = Array.from(
+                    document.querySelectorAll('#interest-form input[name="tags"]:checked')
+                ).map(checkbox => checkbox.value);
+            
+                // Log or process the selected options
+                console.log("Selected Topics:", checkedOptions[0]);
+
+                // Collect the form data
+                const formData = {
+                    tags: checkedOptions,
+                    csrfmiddlewaretoken: '{{ csrf_token }}' // Include CSRF token
+                };
+        
+                // Send the AJAX request
+                $.ajax({
+                    url: "{% url 'select_topics' %}", // URL for the view
+                    method: "POST", // HTTP method
+                    data: formData, // Data to send
+                    success: function (response) {
+                        console.log(response);
+        
+                        if (response.message) {
+                            // Hide the modal and remove blur effect
+                            $('#interest-modal').addClass('hidden');
+                            $('#overlay').addClass('hidden');
+                            $('#main-div').removeClass('blur');
+        
+                            // Optional: Show a success message
+                            console.log(response.message);
+                            window.location.reload();
+                        } else {
+                            alert('An unexpected error occurred.');
+                        }
+                    },
+                    error: function (error) {
+                        console.error(error); // Debug error
+                        alert('An error occurred. Please try again.');
                     }
-                },
-                error: function (error) {
-                    console.error(error); // Debug error
-                    alert('An error occurred. Please try again.');
-                }
+                });
             });
         });
-    });
-    
-</script>
+        
+    </script>
+{% endif %}

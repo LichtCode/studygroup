@@ -82,7 +82,7 @@
                 <!-- Chat Header -->
                 <div class="chat-header d-flex align-items-center justify-content-between">
                     <div class="d-flex align-items-center">
-                    <img src="https://via.placeholder.com/50" alt="Profile Picture" class="rounded-circle me-3">
+                    <img src="https://picsum.photos/60" alt="Profile Picture" class="rounded-circle me-3">
                     <div>
                         <h6 class="mb-0">{{ room.name }}</h6>
                         <small class="text-success">Online</small>
@@ -98,17 +98,19 @@
                     {% for message in messages %}
                         {% if message.sender == request.user %}
                             <div class="chat-bubble chat-bubble-right">
+                                <div class="small text-end">{{ message.sender.username }}</div>
                                 {{ message.content }}
                                 <div class="chat-timestamp text-end">{{ message.timestamp|date:"H:i" }}</div>
                             </div>
                         {% else %}
                             <div class="chat-bubble chat-bubble-left">
+                                <div class="small text-end">{{ message.sender.username }}</div>
                                 {{ message.content }}
                                 <div class="chat-timestamp text-end">{{ message.timestamp|date:"H:i" }}</div>
                             </div>
                         {% endif %}
                     {% empty %}
-                        <p>No messages yet. Start the conversation!</p>
+                        <p id="filler-message">No messages yet. Start the conversation!</p>
                     {% endfor %}
                 </div>
 
@@ -207,6 +209,7 @@
             const messagesDiv = document.getElementById("messages");
             const newMessage = `
             <div class="chat-bubble chat-bubble-${side}">
+                <div class="small">${data.username}</div>
                 ${data.message}
                 <div class="chat-timestamp text-end">${getCurrentTime()}</div>
             </div>`;
@@ -223,6 +226,10 @@
 
         document.getElementById("send-button").onclick = function() {
             console.log("Sending message to chat room");
+
+            const filler = document.getElementById("filler-message");
+            filler.innerHTML = "";
+
             const inputElement = document.getElementById("message-input");
             const message = inputElement.value;
             chatSocket.send(JSON.stringify({

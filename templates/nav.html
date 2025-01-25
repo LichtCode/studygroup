@@ -1,54 +1,56 @@
-<nav class="sidebar bg-dark text-white vh-100">
-    <div class="p-3">
-      <h3 class="text-center">StudyBUDDY</h3>
-      <p class="text-center text-white text-muted">Get yourself a studbuddy </p>
-    </div>
-    <ul class="nav flex-column">
+<nav class="sidebar sticky-top bg-dark text-white vh-100 h-100" id="sidebar">
+  <div class="p-3 d-flex justify-content-center align-items-center">
+      <h3 class="text-center m-0" id="logo-name">StudyBUDDY</h3>
+      <button class="btn btn-dark text-white d-lg-none" id="toggleSidebar">
+          <i class="fas fa-bars"></i>
+      </button>
+  </div>
+  <ul class="nav flex-column" id="navbar">
       <li class="nav-item">
-        <a href="{% url 'dashboard' %}" class="nav-link text-white active" onclick="showSection(event, 'pane1')">
-           Dashboard
-        </a>
+          <a href="{% url 'dashboard' %}" class="nav-link text-white">
+              <i class="fas fa-home"></i> <span class="nav-text">Dashboard</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'groups' %}" class="nav-link text-white" onclick="showSection(event, 'pane2')">
-           Groups
-        </a>
+          <a href="{% url 'groups' %}" class="nav-link text-white">
+              <i class="fas fa-users"></i> <span class="nav-text">Groups</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'topics' %}" class="nav-link text-white" onclick="showSection(event, 'pane3')">
-           Topics
-        </a>
+          <a href="{% url 'topics' %}" class="nav-link text-white">
+              <i class="fas fa-book"></i> <span class="nav-text">Topics</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'study_sessions' %}" class="nav-link text-white" onclick="showSection(event, 'pane4')">
-           Study Sessions
-        </a>
+          <a href="{% url 'study_sessions' %}" class="nav-link text-white">
+              <i class="fas fa-calendar-alt"></i> <span class="nav-text">Study Sessions</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'notifications' %}" class="nav-link text-white" onclick="showSection(event, 'pane5')">
-           Notifications
-        </a>
+          <a href="{% url 'notifications' %}" class="nav-link text-white">
+              <i class="fas fa-bell"></i> <span class="nav-text">Notifications</span>
+          </a>
       </li>
       <hr class="text-secondary">
       <li class="nav-item">
-        <a href="{% url 'profile' user.id %}" class="nav-link text-white" onclick="showSection(event, 'pane6')">
-           Profile
-        </a>
+          <a href="{% url 'profile' request.user.id %}" class="nav-link text-white">
+              <i class="fas fa-user"></i> <span class="nav-text">Profile</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'register' %}" class="nav-link text-white" onclick="showSection(event, 'pane7')">
-           Register
-        </a>
+          <a href="{% url 'register' %}" class="nav-link text-white">
+              <i class="fas fa-user-plus"></i> <span class="nav-text">Register</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'login' %}" class="nav-link text-white" onclick="showSection(event, 'pane8')">
-           Login
-        </a>
+          <a href="{% url 'login' %}" class="nav-link text-white">
+              <i class="fas fa-sign-in-alt"></i> <span class="nav-text">Login</span>
+          </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'logout' %}" class="nav-link text-white" onclick="showSection(event, 'pane11')">
-           Log Out
-        </a>
+          <a href="{% url 'logout' %}" class="nav-link text-white">
+              <i class="fas fa-sign-out-alt"></i> <span class="nav-text">Log Out</span>
+          </a>
       </li>
-    </ul>
-  </nav>
+  </ul>
+</nav>

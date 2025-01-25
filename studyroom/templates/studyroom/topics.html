@@ -56,17 +56,19 @@ footer {
       <div class="col-lg-8">
         <!-- First Row inside the first column -->
         <div class="row">
-          <!-- General Topics -->
+          <!-- Suggested Topics -->
           <div class="col-lg-6">
             <section class="topic-section">
-              <h2 class="section-title card-title">General Topics</h2>
-              <ul id="interested-topics-list" class="list-group list-unstyled">
-                  {% for topic in topics %}
-                      <li class="list-group-item"><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+              <h2 class="card-title section-title">Suggested Topics</h2>
+              <ul id="suggested-topics-list" class="list-unstyled list-group">
+                  {% for topic in suggested_topics %}
+                      <li class="list-group-item"><strong>{{ topic.name }}</strong> : {{ topic.description }} - {{ topic.interested_users.count }}
+                        <button class="btn btn-primary addtopic-btn p-2" data-topic-id="{{ topic.id }}">add</button>
+                      </li>
                   {% empty %}
                       <p>No topics set yet.</p>
                   {% endfor %}
-              </ul>
+            </ul>
             </section>
           </div>
     
@@ -76,9 +78,11 @@ footer {
               <h2 class="section-title card-title">Your Topic Interests</h2>
               <ul id="interested-topics-list" class="list-group list-unstyled">
                   {% for topic in user_topics %}
-                      <li class="list-group-item"><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+                      <li class="list-group-item"><strong>{{ topic.name }}</strong> : {{ topic.description }}
+                        <button class="btn btn-primary removetopic-btn p-2" data-topic-id="{{ topic.id }}">remove</button>
+                      </li>
                   {% empty %}
-                      <p>No topics set yet.</p>
+                      <p id="filler-message">No topics set yet.</p>
                   {% endfor %}
               </ul>
             </section>
@@ -88,17 +92,19 @@ footer {
     
         <!-- Second Row inside the first column -->
         <div class="row">
-          <!-- Suggested Topics -->
+          <!-- General Topics -->
           <div class="col-lg-12 mt-2">
             <section class="topic-section">
-              <h2 class="card-title section-title">Suggested Topics</h2>
-              <ul id="interested-topics-list" class="list-unstyled list-group">
-                  {% for topic in suggested_topics %}
-                      <li class="list-group-item"><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
+              <h2 class="section-title card-title">General Topics</h2>
+              <ul id="General-topics-list" class="list-group list-unstyled">
+                  {% for topic in topics %}
+                      <li class="list-group-item"><strong>{{ topic.name }}</strong> : {{ topic.description }} - {{ topic.interested_users.count }}
+                        <button class="btn btn-primary addtopic-btn p-2" data-topic-id="{{ topic.id }}">add</button>
+                      </li>
                   {% empty %}
                       <p>No topics set yet.</p>
                   {% endfor %}
-            </ul>
+              </ul>
             </section>
           </div>
         </div>
@@ -139,6 +145,52 @@ footer {
 
 
 <script>
+      // Add topic 
+        $(document).on('click', '.addtopic-btn', function() {
+          const topicId = $(this).data('topic-id');
+          console.log('Topic ID:', topicId);  // Log the topic ID
+
+          // Send AJAX request to join group
+          $.ajax({
+              url: "{% url 'add_topic' %}",
+              method: "POST",
+              data: {
+                  'topic_id': topicId,
+                  'csrfmiddlewaretoken': '{{ csrf_token }}'
+              },
+              success: function(data) {
+                window.location.reload();
+                  alert(data.message);  // Show a success message
+              },
+              error: function() {
+                  alert('Error joining the group.');
+              }
+          });
+        });
+
+          // remove topic 
+          $(document).on('click', '.removetopic-btn', function() {
+            const topicId = $(this).data('topic-id');
+    
+            // Send AJAX request to join group
+            $.ajax({
+                url: "{% url 'remove_topic' %}",
+                method: "POST",
+                data: {
+                    'topic_id': topicId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                  window.location.reload();
+                    alert(data.message);  // Show a success message
+
+                },
+                error: function() {
+                    alert('Error joining the group.');
+                }
+            });
+          });
+
     $(document).ready(function () {
         $('#create-topic-form').on('submit', function (e) {
             e.preventDefault();  // Prevent form submission
@@ -160,9 +212,15 @@ footer {
                 data: formData,
                 success: function (response) {
                     console.log(response);
+                    const fillerMessage = document.getElementById('filler-message');
+                    fillerMessage.style.display = 'none';
+                    $('#response-message').text(response.message);
     
                     // Update the interested topics list
-                    const newTopic = `<li>${response.name} - ${response.description}</li>`;
+                    const newTopic = `
+                    <li class="list-group-item"><strong>${response.name}</strong> : ${response.description}
+                        <button class="btn btn-primary removetopic-btn p-2" data-topic-id="${response.topic_id}">remove</button>
+                      </li>`;
                     $('#interested-topics-list').append(newTopic);
     
                     // Clear form inputs

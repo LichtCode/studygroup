@@ -124,16 +124,14 @@
     
 </style>
         <!-- Interest Section -->
-
-        {% if user.tags.count < 0 %}
-            {% include 'studyroom/select_topics.html' with tags=tags user_tags=user_tags %}
-        {% endif %}
+        
+        {% include 'studyroom/select_topics.html' with tags=tags user_tags=user_tags %}
 
         <!-- New Topic Section -->
           <main class="container my-5">
             <!-- Profile Section -->
             <section class="profile-section d-flex align-items-center mb-5">
-              <img src="https://via.placeholder.com/70" alt="Profile Picture" class="rounded-circle me-3" width="70" height="70">
+              <img src="https://picsum.photos/200" alt="Profile Picture" class="rounded-circle me-3" width="70" height="70">
               <div>
                 <h2>{{user.username}}</h2>
                 <p class="text-muted">
@@ -163,14 +161,35 @@
                   </div>
                 </div>
               </div> {% endcomment %}
+
+
+                <!-- User chats -->
+                <div class="col-lg-4">
+                  <div class="card shadow-sm rounded">
+                    <div class="card-body">
+                      <h5 class="card-title">User Chats</h5>
+                      <ul class="list-unstyled">
+                        {% for chatroom in user_chatrooms %}
+                          <li>
+                            <a href="{% url 'chat_room' chatroom.id %}" class="text-decoration-none">
+                              <strong>{{ chatroom.name }}</strong> - {{ chatroom.members.count }}
+                            </a>
+                          </li>
+                        {% empty %}
+                          <p>No chatrooms found.</p>
+                        {% endfor %}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
         
               <!-- Interested Topics -->
               <div class="col-lg-4 w-40">
                 <div class="card shadow-sm rounded">
                   <div class="card-body">
-                    <h5 class="card-title">Your Interested Topics</h5>
+                    <h5 class="card-title">Suggested Topics</h5>
                     <ul class="list-unstyled">
-                      {% for topic in user_topics %}
+                      {% for topic in suggested_topics %}
                         <li><strong>{{ topic.name }}</strong> - {{ topic.description }}</li>
                       {% empty %}
                         <p>No topics set yet.</p>
@@ -201,21 +220,12 @@
                 </div>
               </div>
 
-                <!-- Notifications -->
-                <div class="col-lg-2">
-                    <div class="card shadow-sm rounded text-center">
-                        <div class="card-body">
-                        <span class="fs-1">🔔</span>
-                        <p>Notifications</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         
             <!-- Secondary Content Grid -->
             <div class="row g-4 mt-4">
               <!-- Study Sessions -->
-              <div class="col-lg-6">
+              <div class="col-lg-4">
                 <div class="card shadow-sm rounded">
                   <div class="card-body">
                     <h5 class="card-title">Your Study Sessions</h5>
@@ -251,6 +261,19 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Notifications -->
+              <div class="col-lg-2">
+                <div class="card shadow-sm rounded text-center">
+                  <div class="card-body">
+                    <a href="{% url 'notifications' %}">
+                      <span class="fs-1">🔔</span>
+                      <p>Notifications</p>
+                    </a>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </main>
 

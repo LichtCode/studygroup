@@ -1,31 +1,36 @@
 from django.shortcuts import render, get_object_or_404, redirect
+import datetime
 from django.template.loader import render_to_string
 from django.http import JsonResponse
 from .models import Group, Topic
 from django.contrib.auth.decorators import login_required
-from django.db.utils import IntegrityError
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 from users.models import Tag, CustomUser
 from studysession.models import StudySession
 
 @login_required
-def user_dashboard(request):    
+def user_dashboard(request):
     sessions = request.user.sessions.all()
     user_topics = request.user.interested_topics.all()
-
+    tags = Tag.objects.all()
     user = request.user
     user_tags = user.tags.all()
     matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
+    topic_matches = Topic.objects.filter(tags__in=user_tags).exclude(interested_users=request.user).distinct()
     groups = user.study_groups.all()
+    user_chatrooms = request.user.chatrooms.all()
 
     context = {
-        "sessions": sessions,
+        "sessions": sessions[:5],
         "user_tags": user_tags,
-        "user_topics": user_topics,
+        "user_topics": user_topics[:5],
         "user": user,
-        "matches": matches,
-        'groups': groups,
+        "matches": matches[:5],
+        'groups': groups[:5],
+        'suggested_topics': topic_matches[:5],
+        "tags": tags,
+        "user_chatrooms": user_chatrooms[:5] 
     }
     return render(request, 'studyroom/dashboard.html', context)
 
@@ -71,16 +76,17 @@ def landing_page(request):
 @login_required
 def topics_list(request):
     user_topics = request.user.interested_topics.all()
-    topics = Topic.objects.all()
+    topics = Topic.objects.all().exclude(interested_users=request.user).distinct()
+    topics = topics.order_by('-created_at')
     tags = Tag.objects.all()
     user_tags = request.user.tags.all()
-    topic_matches = Topic.objects.filter(tags__in=user_tags).distinct()
+    topic_matches = Topic.objects.filter(tags__in=user_tags).exclude(interested_users=request.user).distinct()
 
     context = {
-        "user_topics": user_topics,
+        "user_topics": user_topics[:5],
         "tags": tags,
-        "topics": topics,
-        "suggested_topics": topic_matches,
+        "topics": topics[:5],
+        "suggested_topics": topic_matches[:5],
     }
     return render(request, 'studyroom/topics.html', context)
 
@@ -111,7 +117,8 @@ def create_topic(request):
         return JsonResponse({
             'name': topic.name,
             'description': topic.description,
-            'tags': [tag.name for tag in topic.tags.all()]
+            'tags': [tag.name for tag in topic.tags.all()],
+            'topic_id': topic.id
         })
 
     return JsonResponse({'error': 'Invalid request method.'}, status=405)
@@ -120,7 +127,10 @@ def create_topic(request):
 @login_required
 def select_topics(request):
     if request.method == "POST":
-        selected_tags = request.POST.getlist("tags")
+        selected_tags = request.POST.getlist("tags[]")
+
+        # Process the selected tags (e.g., save to the database)
+        print("Selected Tags:", selected_tags)
         user = request.user
 
         user.tags.clear()
@@ -129,7 +139,6 @@ def select_topics(request):
         return JsonResponse({"message": "Topics updated successfully!"}, status=200)
 
     return JsonResponse({"error": "Invalid request method."}, status=405)
-
 
 @login_required
 def find_matches(request):
@@ -213,9 +222,9 @@ def search_group(request):
 @login_required
 def join_group(request):
     if request.method == 'POST':
-        group_id = request.POST.get('group_id')
+        group_id = request.POST.get('topic_id')
         try:
-            group = Group.objects.get(group_id=group_id)
+            group = Group.objects.get(id=group_id)
             group.add_member_to_group(request.user)  # Add the current user to the group
             return JsonResponse({
                 'message': 'You have successfully joined the group!',
@@ -224,4 +233,40 @@ def join_group(request):
                 'group_id': group.id})
         except Group.DoesNotExist:
             return JsonResponse({'message': 'Group not found.'}, status=404)
+    return JsonResponse({'message': 'Invalid request.'}, status=400)
+
+@login_required
+def add_topic(request):
+    print("_______ADD TOPIC________")
+    if request.method == 'POST':
+        topic_id = request.POST.get('topic_id')
+        try:
+            topic = Topic.objects.get(id=topic_id)
+            print("How are you", topic)
+            topic.interested_users.add(request.user)
+            return JsonResponse({
+                'message': 'You have successfully added the topic!',
+                'name': topic.name,
+                'description': topic.description,
+                'members': topic.interested_users.count(),
+                'topic_id': topic.id})
+        except Topic.DoesNotExist:
+            return JsonResponse({'message': 'topic not found.'}, status=404)
+    return JsonResponse({'message': 'Invalid request.'}, status=400)
+
+@login_required
+def remove_topic(request):
+    if request.method == 'POST':
+        topic_id = request.POST.get('topic_id')
+        try:
+            topic = Topic.objects.get(id=topic_id)
+            topic.interested_users.remove(request.user)
+            return JsonResponse({
+                'message': 'You have successfully remove the topic!',
+                'name': topic.name,
+                'description': topic.description,
+                'members': topic.interested_users.count(),
+                'topic_id': topic.id})
+        except Topic.DoesNotExist:
+            return JsonResponse({'message': 'topic not found.'}, status=404)
     return JsonResponse({'message': 'Invalid request.'}, status=400)

@@ -18,6 +18,7 @@ class ChatRoom(models.Model):
         if not chatroom:
             # Create a new chatroom if one doesn't exist
             chatroom = ChatRoom.objects.create()
+            chatroom.name = f"{user1.username} and {user2.username}"
             chatroom.members.add(user1, user2)
             chatroom.save()
         return chatroom
