@@ -11,6 +11,24 @@ from studysession.models import StudySession
 
 @login_required
 def user_dashboard(request):
+    """
+    Render the user dashboard with various user-specific information.
+
+    **Context**
+        sessions: a list of the user's most recent StudySession objects
+        user_topics: a list of the user's most recent interested topics
+        tags: a list of all available Tag objects
+        user: the current user object
+        user_tags: a list of tags associated with the user
+        matches: a list of CustomUser objects with matching tags, excluding the current user
+        topic_matches: a list of Topic objects that share tags with the user but are not yet of interest
+        groups: a list of the user's study groups
+        user_chatrooms: a list of chatrooms the user is a part of
+
+    **Template**
+        studyroom/dashboard.html
+    """
+
     sessions = request.user.sessions.all()
     user_topics = request.user.interested_topics.all()
     tags = Tag.objects.all()
@@ -71,10 +89,30 @@ def landing_page(request):
     #     "suggested_topics": topic_matches,
     #     "notifications": user_notifications,
     # }
+    """
+    Landing page for the study buddy app.
+
+    Args:
+        request: The current request object.
+
+    Returns:
+        A rendered HTML page.
+    """
     return render(request, 'studyroom/landing-page.html')
 
 @login_required
 def topics_list(request):
+    """
+    Shows a list of all topics that the user is not currently interested in.
+
+    The page will display the user's current topics of interest, a list of all topics, and a list of suggested topics based on the user's tags.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        A rendered HTML page with the topic list
+    """
     user_topics = request.user.interested_topics.all()
     topics = Topic.objects.all().exclude(interested_users=request.user).distinct()
     topics = topics.order_by('-created_at')
@@ -93,7 +131,17 @@ def topics_list(request):
 
 @csrf_exempt
 def create_topic(request):
-    print("Create topic got CLICKED")
+    """
+    Creates a new topic with the given name, description, and tags.
+
+    If the request is a POST, it validates the form and if valid, creates a new topic and redirects to the topic page.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        A JSON response indicating the result of the request
+    """
     if request.method == "POST":
         name = request.POST.get('name')
         description = request.POST.get('description')
@@ -126,6 +174,16 @@ def create_topic(request):
 
 @login_required
 def select_topics(request):
+    """
+    Updates the topics of interest for the current user.
+
+    If the request is a POST, it expects a list of tag IDs to be passed
+    in the request body. It clears the current topics of interest for the
+    user and adds the selected topics.
+
+    Returns a JSON response with a success message if the request is valid,
+    or an error message if the request method is invalid.
+    """
     if request.method == "POST":
         selected_tags = request.POST.getlist("tags[]")
 
@@ -142,6 +200,16 @@ def select_topics(request):
 
 @login_required
 def find_matches(request):
+    """
+    Renders a page displaying all the users that share at least one tag with the current user.
+    
+    Args:
+        request (HttpRequest): The HTTP request object.
+    
+    Returns:
+        HttpResponse: A rendered HTML page with the list of matching users.
+    """
+    
     user = request.user
     user_tags = user.tags.all()
     matches = CustomUser.objects.filter(tags__in=user_tags).exclude(id=user.id).distinct()
@@ -150,6 +218,15 @@ def find_matches(request):
 
 @login_required
 def groups_list(request):
+    """
+    Renders a page displaying all the groups the user is a member of, along with all the tags available for creating a new group.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        A rendered HTML page displaying the user's groups and available tags
+    """
     user_groups = request.user.study_groups.all()
     tags = Tag.objects.all()
 
@@ -161,6 +238,17 @@ def groups_list(request):
 
 @login_required
 def create_group(request):
+    """
+    Creates a new group with the given name, description, and tags.
+
+    If the request is a POST, it validates the form and if valid, creates a new group and redirects to the group page.
+
+    Args:
+        request: The HTTP request object
+
+    Returns:
+        A JSON response indicating the result of the request
+    """
     if request.method == 'POST':
         name = request.POST.get('name')
         description = request.POST.get('description', '')
@@ -212,6 +300,15 @@ def group_detail(request, group_id):
 
 @login_required
 def search_group(request):
+    """
+    Searches for groups by name or ID.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        A JSON response containing the HTML of the search results.
+    """
     query = request.GET.get('q', '')
     groups = Group.objects.filter(Q(name__icontains=query) | Q(group_id__icontains=query))
 
@@ -221,6 +318,17 @@ def search_group(request):
 
 @login_required
 def join_group(request):
+    """
+    Joins a group for the current user.
+
+    If the request is a POST, and the group_id parameter is provided, the current user will be added to the group.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        A JSON response indicating the result of the request.
+    """
     if request.method == 'POST':
         group_id = request.POST.get('group_id')
         try:
@@ -237,6 +345,18 @@ def join_group(request):
 
 @login_required
 def add_topic(request):
+    """
+    Adds a topic to the topics of interest for the current user.
+
+    If the request is a POST, and the topic_id parameter is provided, the topic will be added to the topics of interest for the current user.
+
+    Args:
+        request: The request object.
+
+    Returns:
+        A JsonResponse indicating the result of the request.
+    """
+
     if request.method == 'POST':
         topic_id = request.POST.get('topic_id')
         try:
@@ -254,6 +374,15 @@ def add_topic(request):
 
 @login_required
 def remove_topic(request):
+    """
+    Remove a topic from the user's interested topics.
+
+    This view will remove a topic from the user's interested topics when the user clicks the 'remove' button on their topics page.
+    The view will return a JSON response, which will then be used to update the user's topic list on the page.
+
+    :param request: The HTTP request object
+    :return: A JSON response indicating the result of the removal
+    """
     if request.method == 'POST':
         topic_id = request.POST.get('topic_id')
         try:

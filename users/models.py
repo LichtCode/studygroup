@@ -12,4 +12,9 @@ class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
+        """
+        Returns a string representation of the Tag, which is its name.
+
+        :return: The name of the Tag.
+        """
         return self.name

@@ -6,6 +6,11 @@ class ChatRoom(models.Model):
     members = models.ManyToManyField(User, related_name="chatrooms")
 
     def __str__(self):
+        """
+        Returns the name of the chatroom if given, otherwise a string with the id of the chatroom.
+
+        :return: The name of the chatroom if given, otherwise a string with the id of the chatroom.
+        """
         return self.name if self.name else f"ChatRoom {self.id}"
 
     @staticmethod
@@ -30,5 +35,15 @@ class Message(models.Model):
     content = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self):        
+        """
+        Return a string representation of this Message.
+
+        This string is used in the admin interface and elsewhere to identify
+        this Message. It includes the username of the user who sent the
+        message and the first 20 characters of the message content.
+
+        :return: A string representation of this Message.
+        :rtype: str
+        """
         return f"{self.sender.username}: {self.content[:20]}"
