@@ -9,7 +9,7 @@ def logout_view(request):
 
     logout(request)  # Logs out the user
     
-    return redirect('login')
+    return redirect('landing_page')
 
 def register(request):
     if request.method == 'POST':

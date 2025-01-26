@@ -114,7 +114,7 @@ footer {
                           </li>
                       {% endfor %}
                   {% else %}
-                      <p>You are not a member of any groups yet.</p>
+                      <p id="noGroupsMessage">You are not a member of any groups yet.</p>
                   {% endif %}
               </ul>
             </section>
@@ -160,6 +160,10 @@ footer {
                       'csrfmiddlewaretoken': "{{ csrf_token }}"
                     },
                     success: function(data) {
+                     const filler = $('#noGroupsMessage');
+                     if (filler) {
+                        filler.innerHTML = "";
+                     }
                         const newGroup = `
                             <li>
                                 <a href="/group/${data.group_id}/">${data.name}</a>
@@ -209,6 +213,7 @@ footer {
                             $('#group-name').val('');
                             $('#group-description').val('');
                             $('#tags-hidden').val(''); // Clear hidden input
+                            $('#tag-list').empty();
                         },
                         error: function (error) {
                             console.log(error.responseJSON);

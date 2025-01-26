@@ -222,9 +222,9 @@ def search_group(request):
 @login_required
 def join_group(request):
     if request.method == 'POST':
-        group_id = request.POST.get('topic_id')
+        group_id = request.POST.get('group_id')
         try:
-            group = Group.objects.get(id=group_id)
+            group = Group.objects.get(group_id=group_id)
             group.add_member_to_group(request.user)  # Add the current user to the group
             return JsonResponse({
                 'message': 'You have successfully joined the group!',
@@ -237,12 +237,10 @@ def join_group(request):
 
 @login_required
 def add_topic(request):
-    print("_______ADD TOPIC________")
     if request.method == 'POST':
         topic_id = request.POST.get('topic_id')
         try:
             topic = Topic.objects.get(id=topic_id)
-            print("How are you", topic)
             topic.interested_users.add(request.user)
             return JsonResponse({
                 'message': 'You have successfully added the topic!',

@@ -213,8 +213,9 @@ footer {
                 success: function (response) {
                     console.log(response);
                     const fillerMessage = document.getElementById('filler-message');
-                    fillerMessage.style.display = 'none';
-                    $('#response-message').text(response.message);
+                    if (fillerMessage) {
+                      fillerMessage.style.display = 'none';
+                    }
     
                     // Update the interested topics list
                     const newTopic = `
